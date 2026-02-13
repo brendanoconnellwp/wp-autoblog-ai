@@ -12,7 +12,7 @@ AI-powered bulk article generator using the WordPress AI Client SDK. Supports Op
 
 == Description ==
 
-AutoBlog AI lets you generate high-quality blog articles in bulk using AI. It leverages the official WordPress AI Client SDK, so it works with whichever AI provider you've configured in WordPress — OpenAI, Anthropic (Claude), or Google Gemini.
+AutoBlog AI lets you generate high-quality blog articles in bulk using AI. Right now it's a standalone AI plugin that uses BYOK for API access. In the future it will leverage the official WordPress AI Client SDK, so it will work with whichever AI provider you've configured in WordPress — including OpenAI, Anthropic (Claude), Google Gemini or local models you've configured.
 
 **Features:**
 
