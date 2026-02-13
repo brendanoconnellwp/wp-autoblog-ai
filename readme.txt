@@ -1,5 +1,5 @@
 === AutoBlog AI ===
-Contributors: autoblogai
+Contributors: Brendan O'Connell, Various Agentic Flows to help Automate subtasks, autoblogai
 Tags: ai, autoblog, content generation, openai, claude, gemini
 Requires at least: 6.4
 Tested up to: 6.7
