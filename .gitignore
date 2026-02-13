@@ -1,0 +1,26 @@
+# Dependencies
+vendor/
+node_modules/
+
+# Build output
+assets/dist/
+
+# Composer
+composer.lock
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Claude Code
+.claude/
+
+# WordPress
+*.log

@@ -1,0 +1,228 @@
+/* AutoBlog AI Admin Styles */
+
+/* Notice box for AI Credentials link */
+.autoblog-ai-notice {
+	background: #f0f6fc;
+	border-left: 4px solid #2271b1;
+	padding: 12px 16px;
+	margin: 16px 0;
+}
+
+.autoblog-ai-notice p {
+	margin: 0;
+}
+
+/* Generator page layout */
+.autoblog-ai-generator {
+	max-width: 1200px;
+}
+
+.autoblog-ai-generator .generator-columns {
+	display: flex;
+	gap: 24px;
+	align-items: flex-start;
+}
+
+.autoblog-ai-generator .generator-form-column {
+	flex: 1;
+	min-width: 0;
+}
+
+.autoblog-ai-generator .generator-queue-column {
+	flex: 1;
+	min-width: 0;
+}
+
+/* Form card */
+.autoblog-ai-card {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	padding: 24px;
+	margin-bottom: 20px;
+}
+
+.autoblog-ai-card h2 {
+	margin-top: 0;
+	padding: 0;
+	font-size: 1.15em;
+}
+
+/* Titles textarea */
+.autoblog-ai-card textarea {
+	width: 100%;
+	min-height: 180px;
+	font-family: inherit;
+}
+
+/* Form row */
+.autoblog-ai-form-row {
+	margin-bottom: 16px;
+}
+
+.autoblog-ai-form-row label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 4px;
+}
+
+.autoblog-ai-form-row select,
+.autoblog-ai-form-row input[type="number"] {
+	width: 100%;
+	max-width: 300px;
+}
+
+.autoblog-ai-form-row .description {
+	color: #646970;
+	font-size: 13px;
+	margin-top: 4px;
+}
+
+/* Inline form rows */
+.autoblog-ai-form-inline {
+	display: flex;
+	gap: 16px;
+	flex-wrap: wrap;
+}
+
+.autoblog-ai-form-inline .autoblog-ai-form-row {
+	flex: 1;
+	min-width: 140px;
+}
+
+/* Categories / Tags */
+.autoblog-ai-tag-input {
+	display: flex;
+	gap: 8px;
+}
+
+.autoblog-ai-tag-input input {
+	flex: 1;
+}
+
+/* Submit button area */
+.autoblog-ai-submit {
+	margin-top: 20px;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.autoblog-ai-submit .spinner {
+	float: none;
+	margin: 0;
+}
+
+/* Queue table */
+.autoblog-ai-queue-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.autoblog-ai-queue-table th,
+.autoblog-ai-queue-table td {
+	padding: 8px 12px;
+	text-align: left;
+	border-bottom: 1px solid #e0e0e0;
+	vertical-align: top;
+}
+
+.autoblog-ai-queue-table th {
+	font-weight: 600;
+	background: #f6f7f7;
+}
+
+.autoblog-ai-queue-table .queue-title {
+	max-width: 260px;
+	word-break: break-word;
+}
+
+/* Status badges */
+.autoblog-ai-status {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 3px;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1.6;
+}
+
+.autoblog-ai-status--queued {
+	background: #f0f0f1;
+	color: #50575e;
+}
+
+.autoblog-ai-status--generating {
+	background: #fcf0e3;
+	color: #996800;
+}
+
+.autoblog-ai-status--complete {
+	background: #edfaef;
+	color: #00a32a;
+}
+
+.autoblog-ai-status--failed {
+	background: #fcf0f1;
+	color: #d63638;
+}
+
+/* Queue actions */
+.autoblog-ai-queue-actions {
+	white-space: nowrap;
+}
+
+.autoblog-ai-queue-actions a,
+.autoblog-ai-queue-actions button {
+	background: none;
+	border: none;
+	color: #2271b1;
+	cursor: pointer;
+	padding: 0;
+	font-size: 13px;
+	text-decoration: underline;
+}
+
+.autoblog-ai-queue-actions a:hover,
+.autoblog-ai-queue-actions button:hover {
+	color: #135e96;
+}
+
+.autoblog-ai-queue-actions .delete-action {
+	color: #b32d2e;
+}
+
+.autoblog-ai-queue-actions .delete-action:hover {
+	color: #8a2424;
+}
+
+.autoblog-ai-queue-actions .separator {
+	margin: 0 4px;
+	color: #c3c4c7;
+}
+
+/* Empty state */
+.autoblog-ai-queue-empty {
+	padding: 40px 20px;
+	text-align: center;
+	color: #646970;
+}
+
+/* Error message in queue */
+.autoblog-ai-error-message {
+	color: #d63638;
+	font-size: 12px;
+	margin-top: 4px;
+}
+
+/* Settings page */
+.autoblog-ai-settings .form-table th {
+	width: 200px;
+}
+
+/* Responsive */
+@media screen and (max-width: 960px) {
+	.autoblog-ai-generator .generator-columns {
+		flex-direction: column;
+	}
+}

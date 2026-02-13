@@ -1,0 +1,21 @@
+{
+    "name": "autoblog-ai/autoblog-ai",
+    "description": "AI-powered autoblogging plugin for WordPress using the WP AI Client SDK.",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "php": ">=8.0",
+        "wordpress/wp-ai-client": "^0.1",
+        "woocommerce/action-scheduler": "^3.7"
+    },
+    "autoload": {
+        "classmap": [
+            "includes/"
+        ]
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true
+        }
+    }
+}
