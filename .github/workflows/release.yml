@@ -1,0 +1,59 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0'
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install --no-dev --optimize-autoloader --no-interaction
+
+      - name: Build plugin zip
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          PLUGIN_SLUG="autoblog-ai"
+          BUILD_DIR="${PLUGIN_SLUG}"
+
+          mkdir -p "$BUILD_DIR"
+
+          # Copy plugin files (exclude dev/build tooling)
+          rsync -av \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.gitignore' \
+            --exclude='node_modules' \
+            --exclude='package.json' \
+            --exclude='package-lock.json' \
+            --exclude='webpack.config.js' \
+            --exclude='composer.json' \
+            --exclude='composer.lock' \
+            --exclude='.claude' \
+            --exclude="$BUILD_DIR" \
+            ./ "$BUILD_DIR/"
+
+          zip -r "${PLUGIN_SLUG}-${VERSION}.zip" "$BUILD_DIR"
+          echo "ZIP_FILE=${PLUGIN_SLUG}-${VERSION}.zip" >> "$GITHUB_ENV"
+          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "v${{ env.VERSION }}"
+          files: ${{ env.ZIP_FILE }}
+          generate_release_notes: true
