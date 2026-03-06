@@ -48,11 +48,16 @@ class Content_Generator {
 		 */
 		$content = apply_filters( 'autoblog_ai_generated_content', $content, $title, $options );
 
-		// 3. Inject internal links.
+		// 3. Supplement internal links if the AI didn't include enough.
 		if ( ! empty( $options['internal_linking'] ) ) {
-			$max_links = (int) get_option( 'autoblog_ai_max_links', 3 );
-			$linker    = $linker ?? new Internal_Linker();
-			$content   = $linker->inject_links( $content, $title, $max_links );
+			$max_links     = (int) get_option( 'autoblog_ai_max_links', 3 );
+			$existing_links = substr_count( $content, '<a href=' ) - substr_count( $content, '<a href="#' );
+			$remaining     = $max_links - max( 0, $existing_links );
+
+			if ( $remaining > 0 ) {
+				$linker  = $linker ?? new Internal_Linker();
+				$content = $linker->inject_links( $content, $title, $remaining );
+			}
 		}
 
 		// 4. Generate featured image (non-blocking: failure doesn't stop post creation).

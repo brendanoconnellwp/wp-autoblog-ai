@@ -62,9 +62,10 @@ class Activator {
 			'autoblog_ai_article_type'      => 'blog_post',
 			'autoblog_ai_image_provider'    => 'none',
 			'autoblog_ai_image_style'       => 'photorealistic',
-			'autoblog_ai_internal_linking'  => '1',
-			'autoblog_ai_max_links'         => 3,
-			'autoblog_ai_stability_api_key' => '',
+			'autoblog_ai_internal_linking'    => '1',
+			'autoblog_ai_max_links'          => 3,
+			'autoblog_ai_linking_post_types' => array( 'post', 'page' ),
+			'autoblog_ai_stability_api_key'  => '',
 		);
 
 		foreach ( $defaults as $key => $value ) {

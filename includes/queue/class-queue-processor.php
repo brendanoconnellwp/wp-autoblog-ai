@@ -32,8 +32,8 @@ class Queue_Processor {
 			return;
 		}
 
-		// Skip if already processed or in progress.
-		if ( ! in_array( $item->status, array( 'queued', 'failed' ), true ) ) {
+		// Only process items that are properly queued (not failed — those must go through retry_item first).
+		if ( 'queued' !== $item->status ) {
 			return;
 		}
 

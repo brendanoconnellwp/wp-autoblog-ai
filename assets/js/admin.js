@@ -103,7 +103,7 @@
 		if (!items || items.length === 0) {
 			$container.html(
 				'<div class="autoblog-ai-queue-empty">' +
-				'No articles in the queue. Submit titles to get started.' +
+				escHtml(autoblogAI.i18n.emptyQueue) +
 				'</div>'
 			);
 			return;
@@ -112,7 +112,9 @@
 		var html =
 			'<table class="autoblog-ai-queue-table">' +
 			'<thead><tr>' +
-			'<th>Title</th><th>Status</th><th>Actions</th>' +
+			'<th>' + escHtml(autoblogAI.i18n.colTitle) + '</th>' +
+			'<th>' + escHtml(autoblogAI.i18n.colStatus) + '</th>' +
+			'<th>' + escHtml(autoblogAI.i18n.colActions) + '</th>' +
 			'</tr></thead><tbody>';
 
 		items.forEach(function (item) {

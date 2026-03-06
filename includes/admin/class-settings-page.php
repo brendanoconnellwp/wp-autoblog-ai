@@ -79,6 +79,11 @@ class Settings_Page {
 			'sanitize_callback' => 'absint',
 			'default'           => 3,
 		) );
+		register_setting( self::OPTION_GROUP, 'autoblog_ai_linking_post_types', array(
+			'type'              => 'array',
+			'sanitize_callback' => array( $this, 'sanitize_post_types' ),
+			'default'           => array( 'post', 'page' ),
+		) );
 
 		// Sections.
 		add_settings_section(
@@ -119,6 +124,20 @@ class Settings_Page {
 		}
 
 		return Encryption::encrypt( $value );
+	}
+
+	/**
+	 * Sanitize the linking post types array.
+	 *
+	 * @param mixed $value Submitted value.
+	 * @return string[] Sanitized array of post type slugs.
+	 */
+	public function sanitize_post_types( $value ): array {
+		if ( ! is_array( $value ) ) {
+			return array( 'post', 'page' );
+		}
+
+		return array_values( array_map( 'sanitize_key', $value ) );
 	}
 
 	/**

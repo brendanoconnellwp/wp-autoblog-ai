@@ -1,6 +1,6 @@
 === AutoBlog AI ===
-Contributors: Brendan O'Connell, Various Agentic Flows to help Automate subtasks, autoblogai
-Tags: ai, autoblog, content generation, openai, claude, gemini
+Contributors: brendanoconnell, autoblogai
+Tags: ai, content generation, blogging, openai, gemini, claude
 Requires at least: 6.4
 Tested up to: 6.7
 Requires PHP: 8.0
@@ -8,69 +8,94 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-AI-powered bulk article generator using the WordPress AI Client SDK. Supports OpenAI, Anthropic, and Google Gemini for text, plus DALL-E and Stability AI for images.
+Generate blog articles in bulk with AI using a queued workflow, configurable writing controls, and optional featured image generation.
 
 == Description ==
 
-AutoBlog AI lets you generate high-quality blog articles in bulk using AI. Right now it's a standalone AI plugin that uses BYOK for API access. In the future it will leverage the official WordPress AI Client SDK, so it will work with whichever AI provider you've configured in WordPress — including OpenAI, Anthropic (Claude), Google Gemini or local models you've configured.
+AutoBlog AI is a WordPress admin tool for generating multiple long-form articles from a list of titles. Jobs are queued and processed in the background, so you can submit a batch and let it run.
 
-**Features:**
+Text generation uses the WordPress AI Client SDK (BYOK model). Image generation supports DALL-E (via the SDK) and Stability AI (direct API).
 
-* **Bulk article generation** — Enter multiple titles and generate them all at once
-* **Multiple AI providers** — Works with OpenAI, Anthropic, and Google Gemini via the WP AI SDK
-* **Image generation** — Featured images via DALL-E or Stability AI
-* **Smart internal linking** — Automatically links to your existing content
-* **Background processing** — Articles generate asynchronously via Action Scheduler
-* **Customizable content** — Control tone, point of view, article type, word count, FAQs, and key takeaways
-* **Queue management** — Monitor progress, retry failures, and manage the generation queue
+= Core features =
 
-**How it works:**
+* Bulk generation from multiple titles (one per line)
+* Background queue processing with retry support
+* Writing controls: tone, point of view, article type, word count, FAQs, and key takeaways
+* Optional featured image generation (DALL-E or Stability AI)
+* Optional internal linking to existing content
+* Per-item queue visibility (queued, generating, complete, failed)
 
-1. Configure your AI provider in WordPress Settings → AI Credentials
-2. Visit AutoBlog AI → Article Generator
-3. Enter article titles (one per line)
-4. Customize generation settings (tone, word count, etc.)
-5. Click "Generate Articles" and watch the queue process
+= Typical workflow =
+
+1. Configure AI credentials in `Settings -> AI Credentials`.
+2. Open `AutoBlog AI -> Article Generator`.
+3. Add titles and choose generation options.
+4. Submit the batch.
+5. Monitor queue progress and retry failures if needed.
+
+= Requirements =
+
+* WordPress 6.4+
+* PHP 8.0+
+* Composer available on the server/environment for dependency installation
+* Valid AI provider credentials for text generation
+* Stability AI key only if using Stability for images
 
 == Installation ==
 
-1. Upload the `autoblog-ai` folder to `/wp-content/plugins/`
-2. Run `composer install` in the plugin directory
-3. Activate the plugin through the 'Plugins' menu in WordPress
-4. Configure your AI provider in Settings → AI Credentials
-5. (Optional) Configure Stability AI key in AutoBlog AI → Settings
+= Standard install (zip/upload) =
+
+1. Place the plugin in `/wp-content/plugins/autoblog-ai/`.
+2. In the plugin directory, run `composer install`.
+3. Activate the plugin in `Plugins`.
+4. Configure text provider credentials in `Settings -> AI Credentials`.
+5. (Optional) Add Stability API key in `AutoBlog AI -> Settings`.
+
+= Git clone install =
+
+1. `cd wp-content/plugins`
+2. `git clone <your-repo-url> autoblog-ai`
+3. `cd autoblog-ai`
+4. `composer install`
+5. Activate in `Plugins`.
+
+Note: cloning alone is not enough. Dependencies in `vendor/` must be installed.
 
 == Frequently Asked Questions ==
 
-= What AI providers are supported? =
+= Which AI providers are supported? =
 
-For text generation: OpenAI (GPT-4), Anthropic (Claude), and Google Gemini — all managed through the WordPress AI Client SDK.
-For image generation: DALL-E (via the SDK) and Stability AI (direct API).
+For text: providers available through the WordPress AI Client SDK configuration (for example OpenAI, Anthropic, Google Gemini).
+For images: DALL-E (SDK) and Stability AI (direct API).
 
 = Do I need API keys? =
 
-Yes. Text generation API keys are managed in WordPress Settings → AI Credentials (provided by the WP AI SDK). If you want Stability AI images, add that key in AutoBlog AI → Settings.
-
-= Can I customize the generated content? =
-
-Yes. You can control the tone (informative, conversational, professional, etc.), point of view, article type (blog post, listicle, how-to, etc.), word count, number of FAQs, and key takeaways.
-
-= What is internal linking? =
-
-When enabled, AutoBlog AI scans your existing published content and automatically inserts relevant internal links into generated articles. This helps with SEO and site navigation.
+Yes. Text credentials are configured in `Settings -> AI Credentials`. Stability API key is only needed if `Stability AI` is selected as image provider.
 
 = What happens if image generation fails? =
 
-The article is still created without a featured image. The error is stored in post meta for debugging.
+The article can still be created. Image failures are stored so the queue item/post can be reviewed.
+
+= How does queue processing work? =
+
+Each submitted title becomes a queue item and is scheduled with Action Scheduler. Failed items can be retried (up to the plugin limit).
+
+= Can I disable internal linking? =
+
+Yes. Internal linking can be toggled in generator/settings options.
+
+= Why do I see "WP AI Client SDK is not installed"? =
+
+Run `composer install` in the plugin directory and verify dependencies are present.
 
 == Changelog ==
 
 = 1.0.0 =
 * Initial release
 * Bulk article generation with queue management
-* Support for OpenAI, Anthropic, and Google Gemini
-* DALL-E and Stability AI image generation
-* Smart internal linking
+* Text generation via WordPress AI Client SDK
+* Optional image generation via DALL-E and Stability AI
+* Internal linking support
 * Background processing via Action Scheduler
 
 == Upgrade Notice ==
