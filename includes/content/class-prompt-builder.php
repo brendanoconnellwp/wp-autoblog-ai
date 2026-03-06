@@ -68,7 +68,8 @@ class Prompt_Builder {
 		$parts[] = "Target word count: approximately {$word_count} words.";
 
 		if ( '' !== $linking_context ) {
-			$parts[] = "When relevant, naturally reference these related topics from our site (you don't need to add links, just mention the topics naturally):\n{$linking_context}";
+			$max_links = (int) ( $this->options['max_links'] ?? get_option( 'autoblog_ai_max_links', 3 ) );
+			$parts[]   = "IMPORTANT — Internal linking: You MUST include {$max_links} internal links in the article body using HTML anchor tags. Weave them naturally into relevant paragraphs. Here are related articles from our site to link to:\n{$linking_context}\nUse the exact URLs provided. Example: <a href=\"https://example.com/post-slug\">descriptive anchor text</a>. Use varied, descriptive anchor text (not the full title every time). Spread links across different sections of the article — do not cluster them in one paragraph.";
 		}
 
 		$parts[] = 'Return only the HTML article body content. No preamble or commentary.';

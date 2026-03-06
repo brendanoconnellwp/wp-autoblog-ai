@@ -101,6 +101,10 @@ class Admin {
 				'confirmDel'  => __( 'Delete this queue item?', 'autoblog-ai' ),
 				'noTitles'    => __( 'Please enter at least one article title.', 'autoblog-ai' ),
 				'submitError' => __( 'Failed to submit articles. Please try again.', 'autoblog-ai' ),
+				'emptyQueue'  => __( 'No articles in the queue. Submit titles to get started.', 'autoblog-ai' ),
+				'colTitle'    => __( 'Title', 'autoblog-ai' ),
+				'colStatus'   => __( 'Status', 'autoblog-ai' ),
+				'colActions'  => __( 'Actions', 'autoblog-ai' ),
 			),
 		) );
 	}

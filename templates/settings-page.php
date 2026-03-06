@@ -142,6 +142,7 @@ if ( '' !== $stability_key_raw ) {
 			<tr>
 				<th scope="row"><?php esc_html_e( 'Enable Internal Linking', 'autoblog-ai' ); ?></th>
 				<td>
+					<input type="hidden" name="autoblog_ai_internal_linking" value="0">
 					<label>
 						<input type="checkbox" name="autoblog_ai_internal_linking" value="1"
 							<?php checked( get_option( 'autoblog_ai_internal_linking', '1' ), '1' ); ?>>
@@ -155,6 +156,30 @@ if ( '' !== $stability_key_raw ) {
 					<input type="number" id="autoblog_ai_max_links" name="autoblog_ai_max_links"
 						value="<?php echo esc_attr( get_option( 'autoblog_ai_max_links', 3 ) ); ?>"
 						min="1" max="20" class="small-text">
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Post Types to Link', 'autoblog-ai' ); ?></th>
+				<td>
+					<?php
+					$available_types = get_post_types( array( 'public' => true ), 'objects' );
+					unset( $available_types['attachment'] );
+
+					$saved_types = get_option( 'autoblog_ai_linking_post_types', array() );
+					$enabled_types = ( ! empty( $saved_types ) && is_array( $saved_types ) ) ? $saved_types : array( 'post', 'page' );
+
+					foreach ( $available_types as $pt ) :
+					?>
+						<label style="display: block; margin-bottom: 4px;">
+							<input type="checkbox"
+								name="autoblog_ai_linking_post_types[]"
+								value="<?php echo esc_attr( $pt->name ); ?>"
+								<?php checked( in_array( $pt->name, $enabled_types, true ) ); ?>>
+							<?php echo esc_html( $pt->labels->name ); ?>
+							<code style="font-size: 12px; color: #666;">(<?php echo esc_html( $pt->name ); ?>)</code>
+						</label>
+					<?php endforeach; ?>
+					<p class="description"><?php esc_html_e( 'Select which post types to include when searching for internal link targets.', 'autoblog-ai' ); ?></p>
 				</td>
 			</tr>
 		</table>

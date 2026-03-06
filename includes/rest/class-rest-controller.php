@@ -95,6 +95,10 @@ class Rest_Controller {
 
 		$ids = Queue_Manager::add_batch( $titles, $options );
 
+		if ( empty( $ids ) ) {
+			return new \WP_REST_Response( array( 'message' => 'No valid titles provided.' ), 400 );
+		}
+
 		return new \WP_REST_Response( array(
 			'message' => sprintf( '%d article(s) queued.', count( $ids ) ),
 			'ids'     => $ids,
@@ -164,30 +168,40 @@ class Rest_Controller {
 			'word_count' => array(
 				'type'    => 'integer',
 				'default' => 1500,
+				'minimum' => 300,
+				'maximum' => 10000,
 			),
 			'article_type' => array(
 				'type'    => 'string',
 				'default' => 'blog_post',
+				'enum'    => array( 'blog_post', 'listicle', 'how_to', 'review', 'comparison', 'news' ),
 			),
 			'tone' => array(
 				'type'    => 'string',
 				'default' => 'informative',
+				'enum'    => array( 'informative', 'conversational', 'professional', 'casual', 'academic', 'persuasive' ),
 			),
 			'pov' => array(
 				'type'    => 'string',
 				'default' => 'third',
+				'enum'    => array( 'first', 'second', 'third' ),
 			),
 			'faq_count' => array(
 				'type'    => 'integer',
 				'default' => 3,
+				'minimum' => 0,
+				'maximum' => 10,
 			),
 			'takeaway_count' => array(
 				'type'    => 'integer',
 				'default' => 3,
+				'minimum' => 0,
+				'maximum' => 10,
 			),
 			'post_status' => array(
 				'type'    => 'string',
 				'default' => 'draft',
+				'enum'    => array( 'draft', 'publish', 'pending' ),
 			),
 			'category' => array(
 				'type'    => 'integer',
@@ -200,14 +214,18 @@ class Rest_Controller {
 			'image_provider' => array(
 				'type'    => 'string',
 				'default' => 'none',
+				'enum'    => array( 'none', 'dall-e', 'stability' ),
 			),
 			'image_style' => array(
 				'type'    => 'string',
 				'default' => 'photorealistic',
+				'enum'    => array( 'photorealistic', 'illustration', '3d_render', 'digital_art', 'watercolor' ),
 			),
 			'internal_linking' => array(
 				'type'    => 'integer',
 				'default' => 1,
+				'minimum' => 0,
+				'maximum' => 1,
 			),
 		);
 	}

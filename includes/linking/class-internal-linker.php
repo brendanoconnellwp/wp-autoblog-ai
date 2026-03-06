@@ -35,10 +35,12 @@ class Internal_Linker {
 	);
 
 	/**
-	 * Get context string for the AI prompt (titles of related posts).
+	 * Get context string for the AI prompt with titles and URLs.
+	 *
+	 * Provides the AI with actual links it can embed in the generated HTML.
 	 *
 	 * @param string $title Article title being generated.
-	 * @return string Context string listing related post titles.
+	 * @return string Context string listing related post titles and URLs.
 	 */
 	public function get_context_for_prompt( string $title ): string {
 		$related = $this->find_related_posts( $title, 10 );
@@ -49,7 +51,8 @@ class Internal_Linker {
 
 		$lines = array();
 		foreach ( $related as $post ) {
-			$lines[] = '- ' . $post->post_title;
+			$url     = get_permalink( $post->ID );
+			$lines[] = '- "' . $post->post_title . '" (' . $url . ')';
 		}
 
 		return implode( "\n", $lines );
@@ -118,9 +121,10 @@ class Internal_Linker {
 
 		// Search for posts that contain any of our keywords.
 		$search_term = implode( ' ', array_slice( $title_keywords, 0, 3 ) );
+		$post_types  = self::get_linking_post_types();
 
 		$query = new \WP_Query( array(
-			'post_type'      => array( 'post', 'page' ),
+			'post_type'      => $post_types,
 			'post_status'    => 'publish',
 			's'              => $search_term,
 			'posts_per_page' => 50,
@@ -172,6 +176,35 @@ class Internal_Linker {
 		$words = preg_split( '/\s+/', $text, -1, PREG_SPLIT_NO_EMPTY );
 
 		return array_values( array_diff( $words, self::STOP_WORDS ) );
+	}
+
+	/**
+	 * Get the post types enabled for internal linking.
+	 *
+	 * @return string[]
+	 */
+	public static function get_linking_post_types(): array {
+		$saved = get_option( 'autoblog_ai_linking_post_types', array() );
+
+		if ( ! empty( $saved ) && is_array( $saved ) ) {
+			return $saved;
+		}
+
+		return array( 'post', 'page' );
+	}
+
+	/**
+	 * Get all public post types available for linking.
+	 *
+	 * @return \WP_Post_Type[]
+	 */
+	public static function get_available_post_types(): array {
+		$post_types = get_post_types( array( 'public' => true ), 'objects' );
+
+		// Exclude attachments — they are not useful for internal linking.
+		unset( $post_types['attachment'] );
+
+		return $post_types;
 	}
 
 	/**

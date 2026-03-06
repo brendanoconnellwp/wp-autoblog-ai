@@ -29,6 +29,7 @@ $options = array(
 	'autoblog_ai_stability_api_key',
 	'autoblog_ai_internal_linking',
 	'autoblog_ai_max_links',
+	'autoblog_ai_linking_post_types',
 );
 
 foreach ( $options as $option ) {
