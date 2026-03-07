@@ -95,7 +95,7 @@ class Content_Generator {
 	 * @throws \RuntimeException If the SDK call fails.
 	 */
 	private function call_ai_sdk( string $system_prompt, string $user_prompt ): string {
-		if ( ! function_exists( 'wp_ai_client_prompt' ) ) {
+		if ( ! class_exists( '\WordPress\AiClient\AiClient' ) ) {
 			throw new \RuntimeException( 'WordPress AI Client is not available. Requires WordPress 7.0+ or the wp-ai-client plugin.' );
 		}
 
@@ -112,10 +112,13 @@ class Content_Generator {
 		} );
 
 		try {
-			$text = wp_ai_client_prompt( $user_prompt )
-				->using_system_instruction( $system_prompt )
-				->using_temperature( $temperature )
-				->generate_text();
+			$registry = \WordPress\AiClient\AiClient::defaultRegistry();
+			$builder  = new \WordPress\AiClient\Builders\PromptBuilder( $registry, $user_prompt );
+
+			$text = $builder
+				->usingSystemInstruction( $system_prompt )
+				->usingTemperature( $temperature )
+				->generateText();
 
 			if ( is_wp_error( $text ) ) {
 				throw new \RuntimeException( $text->get_error_message() );
