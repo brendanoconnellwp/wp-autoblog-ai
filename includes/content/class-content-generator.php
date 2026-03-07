@@ -107,18 +107,15 @@ class Content_Generator {
 		$temperature = apply_filters( 'autoblog_ai_temperature', 0.7 );
 
 		// Increase timeout for long article generation.
-		$bump_timeout = function () {
-			return 120;
-		};
-		add_filter( 'wp_ai_client_default_request_timeout', $bump_timeout );
+		add_filter( 'http_request_timeout', function ( $timeout ) {
+			return max( $timeout, 120 );
+		} );
 
 		try {
 			$text = wp_ai_client_prompt( $user_prompt )
 				->using_system_instruction( $system_prompt )
 				->using_temperature( $temperature )
 				->generate_text();
-
-			remove_filter( 'wp_ai_client_default_request_timeout', $bump_timeout );
 
 			if ( is_wp_error( $text ) ) {
 				throw new \RuntimeException( $text->get_error_message() );
@@ -130,10 +127,8 @@ class Content_Generator {
 
 			return $text;
 		} catch ( \RuntimeException $e ) {
-			remove_filter( 'wp_ai_client_default_request_timeout', $bump_timeout );
 			throw $e;
 		} catch ( \Throwable $e ) {
-			remove_filter( 'wp_ai_client_default_request_timeout', $bump_timeout );
 			throw new \RuntimeException( 'AI text generation failed: ' . $e->getMessage() );
 		}
 	}
