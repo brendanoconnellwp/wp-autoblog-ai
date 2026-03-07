@@ -18,13 +18,14 @@ if ( '' !== $stability_key_raw ) {
 	<div class="autoblog-ai-notice">
 		<p>
 			<?php
-			printf(
-				/* translators: %s: link to AI Credentials settings */
-				esc_html__( 'Text generation API keys (OpenAI, Anthropic, Gemini) are managed in %s via the WordPress AI Client SDK.', 'autoblog-ai' ),
-				'<a href="' . esc_url( admin_url( 'options-general.php?page=ai-credentials' ) ) . '">' . esc_html__( 'Settings &rarr; AI Credentials', 'autoblog-ai' ) . '</a>'
-			);
+			esc_html_e( 'Text generation API keys (OpenAI, Anthropic, Gemini) are managed by their respective AI Provider plugins. Install and configure at least one AI Provider plugin from the WordPress plugin directory.', 'autoblog-ai' );
 			?>
 		</p>
+		<?php if ( function_exists( 'wp_ai_client_prompt' ) ) : ?>
+			<p style="color: green;">&#10003; <?php esc_html_e( 'WordPress AI Client detected.', 'autoblog-ai' ); ?></p>
+		<?php else : ?>
+			<p style="color: red;">&#10007; <?php esc_html_e( 'WordPress AI Client not detected. Requires WordPress 7.0+ or the wp-ai-client plugin, plus at least one AI Provider plugin.', 'autoblog-ai' ); ?></p>
+		<?php endif; ?>
 	</div>
 
 	<form method="post" action="options.php">

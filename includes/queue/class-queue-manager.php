@@ -64,19 +64,22 @@ class Queue_Manager {
 	 * Schedule a single queue item for processing.
 	 */
 	public static function schedule_item( int $queue_id ): void {
-		if ( ! function_exists( 'as_enqueue_async_action' ) ) {
+		if ( function_exists( 'as_enqueue_async_action' ) ) {
+			$action_id = as_enqueue_async_action(
+				'autoblog_ai_process_article',
+				array( 'queue_id' => $queue_id ),
+				'autoblog-ai'
+			);
+
+			if ( $action_id ) {
+				self::update( $queue_id, array( 'action_id' => $action_id ) );
+			}
 			return;
 		}
 
-		$action_id = as_enqueue_async_action(
-			'autoblog_ai_process_article',
-			array( 'queue_id' => $queue_id ),
-			'autoblog-ai'
-		);
-
-		if ( $action_id ) {
-			self::update( $queue_id, array( 'action_id' => $action_id ) );
-		}
+		// Fallback: process synchronously when Action Scheduler is not available.
+		$processor = new Queue_Processor();
+		$processor->process( $queue_id );
 	}
 
 	/**
