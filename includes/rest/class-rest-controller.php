@@ -204,8 +204,9 @@ class Rest_Controller {
 				'enum'    => array( 'draft', 'publish', 'pending' ),
 			),
 			'category' => array(
-				'type'    => 'integer',
-				'default' => 0,
+				'type'              => array( 'integer', 'string' ),
+				'default'           => 0,
+				'sanitize_callback' => 'absint',
 			),
 			'tags' => array(
 				'type'    => 'string',

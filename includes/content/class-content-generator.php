@@ -95,8 +95,8 @@ class Content_Generator {
 	 * @throws \RuntimeException If the SDK call fails.
 	 */
 	private function call_ai_sdk( string $system_prompt, string $user_prompt ): string {
-		if ( ! class_exists( '\\Developer_Portal\\WP_AI_Client\\AI_Client' ) ) {
-			throw new \RuntimeException( 'WP AI Client SDK is not installed. Please install the wordpress/wp-ai-client package.' );
+		if ( ! function_exists( 'wp_ai_client_prompt' ) ) {
+			throw new \RuntimeException( 'WordPress AI Client is not available. Requires WordPress 7.0+ or the wp-ai-client plugin.' );
 		}
 
 		/**
@@ -106,15 +106,23 @@ class Content_Generator {
 		 */
 		$temperature = apply_filters( 'autoblog_ai_temperature', 0.7 );
 
-		try {
-			$client = new \Developer_Portal\WP_AI_Client\AI_Client();
+		// Increase timeout for long article generation.
+		$bump_timeout = function () {
+			return 120;
+		};
+		add_filter( 'wp_ai_client_default_request_timeout', $bump_timeout );
 
-			$response = $client->prompt( $user_prompt )
-				->system( $system_prompt )
-				->option( 'temperature', $temperature )
+		try {
+			$text = wp_ai_client_prompt( $user_prompt )
+				->using_system_instruction( $system_prompt )
+				->using_temperature( $temperature )
 				->generate_text();
 
-			$text = $response->get_text();
+			remove_filter( 'wp_ai_client_default_request_timeout', $bump_timeout );
+
+			if ( is_wp_error( $text ) ) {
+				throw new \RuntimeException( $text->get_error_message() );
+			}
 
 			if ( empty( $text ) ) {
 				throw new \RuntimeException( 'AI returned empty content.' );
@@ -122,8 +130,10 @@ class Content_Generator {
 
 			return $text;
 		} catch ( \RuntimeException $e ) {
+			remove_filter( 'wp_ai_client_default_request_timeout', $bump_timeout );
 			throw $e;
 		} catch ( \Throwable $e ) {
+			remove_filter( 'wp_ai_client_default_request_timeout', $bump_timeout );
 			throw new \RuntimeException( 'AI text generation failed: ' . $e->getMessage() );
 		}
 	}

@@ -19,36 +19,39 @@ class Dall_E_Provider {
 	 * @throws \RuntimeException On failure.
 	 */
 	public function generate( string $prompt ): array {
-		if ( ! class_exists( '\\Developer_Portal\\WP_AI_Client\\AI_Client' ) ) {
-			throw new \RuntimeException( 'WP AI Client SDK is not installed.' );
+		if ( ! function_exists( 'wp_ai_client_prompt' ) ) {
+			throw new \RuntimeException( 'WordPress AI Client is not available. Requires WordPress 7.0+ or the wp-ai-client plugin.' );
 		}
 
 		try {
-			$client   = new \Developer_Portal\WP_AI_Client\AI_Client();
-			$response = $client->prompt( $prompt )->generate_image();
+			$image_file = wp_ai_client_prompt( $prompt )
+				->using_provider( 'openai' )
+				->generate_image();
 
-			$url = $response->get_url();
-
-			if ( empty( $url ) ) {
-				throw new \RuntimeException( 'DALL-E returned no image URL.' );
+			if ( is_wp_error( $image_file ) ) {
+				throw new \RuntimeException( 'DALL-E generation failed: ' . $image_file->get_error_message() );
 			}
 
-			// Download the image.
-			$download = wp_remote_get( $url, array( 'timeout' => 60 ) );
+			$data_uri = $image_file->getDataUri();
 
-			if ( is_wp_error( $download ) ) {
-				throw new \RuntimeException( 'Failed to download DALL-E image: ' . $download->get_error_message() );
+			if ( empty( $data_uri ) ) {
+				throw new \RuntimeException( 'DALL-E returned no image data.' );
 			}
 
-			$body = wp_remote_retrieve_body( $download );
-			$mime = wp_remote_retrieve_header( $download, 'content-type' ) ?: 'image/png';
+			// Parse data URI to get binary data and MIME type.
+			if ( ! preg_match( '/^data:([^;]+);base64,(.+)$/', $data_uri, $matches ) ) {
+				throw new \RuntimeException( 'Failed to parse DALL-E image data URI.' );
+			}
 
-			if ( empty( $body ) ) {
-				throw new \RuntimeException( 'Downloaded DALL-E image was empty.' );
+			$mime       = $matches[1];
+			$image_data = base64_decode( $matches[2] );
+
+			if ( false === $image_data ) {
+				throw new \RuntimeException( 'Failed to decode DALL-E image data.' );
 			}
 
 			return array(
-				'data' => $body,
+				'data' => $image_data,
 				'mime' => $mime,
 			);
 		} catch ( \RuntimeException $e ) {
