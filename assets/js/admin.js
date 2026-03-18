@@ -2,6 +2,7 @@
 (function ($) {
 	'use strict';
 
+	var MAX_BATCH_SIZE = 50;
 	var pollTimer = null;
 	var isPolling = false;
 
@@ -11,7 +12,6 @@
 	function handleFormSubmit(e) {
 		e.preventDefault();
 
-		var $form = $(this);
 		var $btn = $('#autoblog-ai-submit-btn');
 		var $spinner = $('#autoblog-ai-spinner');
 		var titlesRaw = $('#autoblog-ai-titles').val().trim();
@@ -29,6 +29,11 @@
 
 		if (titles.length === 0) {
 			alert(autoblogAI.i18n.noTitles);
+			return;
+		}
+
+		if (titles.length > MAX_BATCH_SIZE) {
+			alert(autoblogAI.i18n.tooManyTitles);
 			return;
 		}
 
@@ -70,8 +75,12 @@
 					$('html, body').animate({ scrollTop: $queue.offset().top - 40 }, 300);
 				}
 			})
-			.fail(function () {
-				alert(autoblogAI.i18n.submitError);
+			.fail(function (xhr) {
+				var msg = autoblogAI.i18n.submitError;
+				if (xhr.responseJSON && xhr.responseJSON.message) {
+					msg = xhr.responseJSON.message;
+				}
+				alert(msg);
 			})
 			.always(function () {
 				$btn.prop('disabled', false);
@@ -87,18 +96,26 @@
 			url: autoblogAI.restUrl + 'queue',
 			method: 'GET',
 			headers: { 'X-WP-Nonce': autoblogAI.nonce },
-		}).done(function (items) {
-			renderQueue(items);
+		})
+			.done(function (items) {
+				renderQueue(items);
 
-			// Stop polling if nothing is active.
-			var hasActive = items.some(function (item) {
-				return item.status === 'queued' || item.status === 'generating';
+				// Stop polling if nothing is active.
+				var hasActive = items.some(function (item) {
+					return item.status === 'queued' || item.status === 'generating';
+				});
+
+				if (!hasActive) {
+					stopPolling();
+				}
+			})
+			.fail(function (xhr) {
+				// If nonce expired (403), stop polling to avoid spamming.
+				if (xhr.status === 403) {
+					stopPolling();
+					showNotice(autoblogAI.i18n.submitError);
+				}
 			});
-
-			if (!hasActive) {
-				stopPolling();
-			}
-		});
 	}
 
 	/**
@@ -116,7 +133,21 @@
 			return;
 		}
 
-		var html =
+		// Check if there are finished items for the clear button.
+		var hasFinished = items.some(function (item) {
+			return item.status === 'complete' || item.status === 'failed';
+		});
+
+		var html = '';
+
+		if (hasFinished) {
+			html += '<div class="autoblog-ai-queue-toolbar">' +
+				'<button type="button" class="button button-link-delete clear-queue-action">' +
+				escHtml(autoblogAI.i18n.clearQueue) +
+				'</button></div>';
+		}
+
+		html +=
 			'<table class="autoblog-ai-queue-table">' +
 			'<thead><tr>' +
 			'<th>' + escHtml(autoblogAI.i18n.colTitle) + '</th>' +
@@ -216,6 +247,27 @@
 	}
 
 	/**
+	 * Handle clear queue click.
+	 */
+	function handleClearQueue(e) {
+		if (!confirm(autoblogAI.i18n.confirmClear)) {
+			return;
+		}
+		var $btn = $(e.target);
+		$btn.prop('disabled', true);
+		$.ajax({
+			url: autoblogAI.restUrl + 'queue/clear',
+			method: 'POST',
+			headers: { 'X-WP-Nonce': autoblogAI.nonce },
+		}).done(function (response) {
+			showNotice(response.message);
+			refreshQueue();
+		}).fail(function () {
+			$btn.prop('disabled', false);
+		});
+	}
+
+	/**
 	 * Start polling the queue every 5 seconds.
 	 */
 	function startPolling() {
@@ -270,6 +322,7 @@
 		$('#autoblog-ai-generator-form').on('submit', handleFormSubmit);
 		$('#autoblog-ai-queue').on('click', '.retry-action', handleRetry);
 		$('#autoblog-ai-queue').on('click', '.delete-action', handleDelete);
+		$('#autoblog-ai-queue').on('click', '.clear-queue-action', handleClearQueue);
 
 		// Initial queue load.
 		refreshQueue();

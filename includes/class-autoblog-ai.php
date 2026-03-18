@@ -29,10 +29,15 @@ final class Autoblog_AI {
 	}
 
 	private function init_hooks(): void {
+		// i18n.
+		add_action( 'init', array( $this, 'load_textdomain' ) );
+
 		// Admin.
 		if ( is_admin() ) {
 			$admin = new Admin\Admin();
 			$admin->register();
+
+			add_action( 'admin_notices', array( $this, 'maybe_show_dependency_notice' ) );
 		}
 
 		// REST API.
@@ -41,6 +46,32 @@ final class Autoblog_AI {
 		// Queue processor (front and back end — Action Scheduler can run via cron).
 		$processor = new Queue\Queue_Processor();
 		$processor->register();
+	}
+
+	/**
+	 * Show an admin notice if the WP AI Client dependency is missing.
+	 */
+	public function maybe_show_dependency_notice(): void {
+		if ( class_exists( '\WordPress\AiClient\AiClient' ) || ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		$screen = get_current_screen();
+		if ( ! $screen || ! str_contains( $screen->id, 'autoblog-ai' ) ) {
+			return;
+		}
+
+		printf(
+			'<div class="notice notice-error"><p>%s</p></div>',
+			esc_html__( 'AutoBlog AI requires the WordPress AI Client to generate articles. Please upgrade to WordPress 7.0+ or install the wp-ai-client plugin.', 'autoblog-ai' )
+		);
+	}
+
+	/**
+	 * Load the plugin text domain for translations.
+	 */
+	public function load_textdomain(): void {
+		load_plugin_textdomain( 'autoblog-ai', false, dirname( AUTOBLOG_AI_PLUGIN_BASENAME ) . '/languages' );
 	}
 
 	/**

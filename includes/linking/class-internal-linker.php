@@ -35,6 +35,13 @@ class Internal_Linker {
 	);
 
 	/**
+	 * Cached related posts per title to avoid redundant queries.
+	 *
+	 * @var array<string, \WP_Post[]>
+	 */
+	private array $cache = array();
+
+	/**
 	 * Get context string for the AI prompt with titles and URLs.
 	 *
 	 * Provides the AI with actual links it can embed in the generated HTML.
@@ -108,14 +115,24 @@ class Internal_Linker {
 	/**
 	 * Find related published posts by keyword overlap.
 	 *
+	 * Results are cached per title so that get_context_for_prompt() and
+	 * inject_links() don't run duplicate queries for the same article.
+	 *
 	 * @param string $title     Reference title for relevance scoring.
 	 * @param int    $max_posts Maximum posts to return.
 	 * @return \WP_Post[]
 	 */
 	private function find_related_posts( string $title, int $max_posts ): array {
+		$cache_key = strtolower( $title );
+
+		if ( isset( $this->cache[ $cache_key ] ) ) {
+			return array_slice( $this->cache[ $cache_key ], 0, $max_posts );
+		}
+
 		$title_keywords = $this->extract_keywords( $title );
 
 		if ( empty( $title_keywords ) ) {
+			$this->cache[ $cache_key ] = array();
 			return array();
 		}
 
@@ -124,15 +141,17 @@ class Internal_Linker {
 		$post_types  = self::get_linking_post_types();
 
 		$query = new \WP_Query( array(
-			'post_type'      => $post_types,
-			'post_status'    => 'publish',
-			's'              => $search_term,
-			'posts_per_page' => 50,
-			'no_found_rows'  => true,
-			'fields'         => 'all',
+			'post_type'              => $post_types,
+			'post_status'            => 'publish',
+			's'                      => $search_term,
+			'posts_per_page'         => 50,
+			'no_found_rows'          => true,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
 		) );
 
 		if ( ! $query->have_posts() ) {
+			$this->cache[ $cache_key ] = array();
 			return array();
 		}
 
@@ -157,11 +176,14 @@ class Internal_Linker {
 		} );
 
 		$result = array();
-		foreach ( array_slice( $scored, 0, $max_posts ) as $item ) {
+		foreach ( $scored as $item ) {
 			$result[] = $item['post'];
 		}
 
-		return $result;
+		// Cache the full sorted list; callers slice to their own max.
+		$this->cache[ $cache_key ] = $result;
+
+		return array_slice( $result, 0, $max_posts );
 	}
 
 	/**

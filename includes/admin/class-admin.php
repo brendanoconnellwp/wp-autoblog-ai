@@ -102,9 +102,12 @@ class Admin {
 				'noTitles'    => __( 'Please enter at least one article title.', 'autoblog-ai' ),
 				'submitError' => __( 'Failed to submit articles. Please try again.', 'autoblog-ai' ),
 				'emptyQueue'  => __( 'No articles in the queue. Submit titles to get started.', 'autoblog-ai' ),
-				'colTitle'    => __( 'Title', 'autoblog-ai' ),
-				'colStatus'   => __( 'Status', 'autoblog-ai' ),
-				'colActions'  => __( 'Actions', 'autoblog-ai' ),
+				'colTitle'       => __( 'Title', 'autoblog-ai' ),
+				'colStatus'      => __( 'Status', 'autoblog-ai' ),
+				'colActions'     => __( 'Actions', 'autoblog-ai' ),
+				'clearQueue'     => __( 'Clear Finished', 'autoblog-ai' ),
+				'confirmClear'   => __( 'Remove all completed and failed items from the queue?', 'autoblog-ai' ),
+				'tooManyTitles'  => sprintf( __( 'Too many titles. Maximum is %d per batch.', 'autoblog-ai' ), 50 ),
 			),
 		) );
 	}
