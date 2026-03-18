@@ -44,6 +44,10 @@ jobs:
             --exclude='composer.json' \
             --exclude='composer.lock' \
             --exclude='.claude' \
+            --exclude='tests' \
+            --exclude='.wp-env.json' \
+            --exclude='blueprint.json' \
+            --exclude='README.md' \
             --exclude="$BUILD_DIR" \
             ./ "$BUILD_DIR/"
 

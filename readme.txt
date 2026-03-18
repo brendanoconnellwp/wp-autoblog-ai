@@ -2,9 +2,9 @@
 Contributors: brendanoconnell
 Tags: ai, content generation, blogging, openai, gemini, claude
 Requires at least: 6.4
-Tested up to: 6.7
+Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 1.0.0
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,7 +71,23 @@ Each submitted title becomes a queue item and is scheduled with Action Scheduler
 
 Yes. Internal linking can be toggled in the generator form and in `AutoBlog AI -> Settings`.
 
-== Upgrade Notice ==
+== Changelog ==
+
+= 1.3.0 =
+* Migrated to WordPress 7.0 native AI Client API.
+* Fixed timeout handling for long article generation.
+
+= 1.2.0 =
+* Added GitHub release workflow.
+* Improved timeout handling with http_request_timeout filter.
+
+= 1.1.0 =
+* Internal improvements.
 
 = 1.0.0 =
-Initial release.
+* Initial release.
+
+== Upgrade Notice ==
+
+= 1.3.0 =
+Requires WordPress 7.0+ or the wp-ai-client plugin for text generation.

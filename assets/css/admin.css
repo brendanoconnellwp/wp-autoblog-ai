@@ -90,16 +90,6 @@
 	min-width: 140px;
 }
 
-/* Categories / Tags */
-.autoblog-ai-tag-input {
-	display: flex;
-	gap: 8px;
-}
-
-.autoblog-ai-tag-input input {
-	flex: 1;
-}
-
 /* Submit button area */
 .autoblog-ai-submit {
 	margin-top: 20px;
@@ -213,6 +203,28 @@
 	color: #d63638;
 	font-size: 12px;
 	margin-top: 4px;
+}
+
+/* Inline success notice */
+.autoblog-ai-inline-notice {
+	background: #edfaef;
+	color: #00a32a;
+	border: 1px solid #00a32a;
+	border-radius: 3px;
+	padding: 8px 12px;
+	margin-bottom: 12px;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+/* Generating status pulse animation */
+.autoblog-ai-status--generating {
+	animation: autoblog-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes autoblog-pulse {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0.5; }
 }
 
 /* Settings page */

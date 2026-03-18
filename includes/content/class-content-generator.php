@@ -39,6 +39,9 @@ class Content_Generator {
 		// 2. Generate text via WP AI Client SDK.
 		$content = $this->call_ai_sdk( $system_prompt, $user_prompt );
 
+		// Sanitize raw HTML before any further processing.
+		$content = wp_kses_post( $content );
+
 		/**
 		 * Filter the generated content before post creation.
 		 *
@@ -60,7 +63,10 @@ class Content_Generator {
 			}
 		}
 
-		// 4. Generate featured image (non-blocking: failure doesn't stop post creation).
+		// 4. Convert raw HTML to Gutenberg blocks.
+		$content = Block_Converter::convert( $content );
+
+		// 5. Generate featured image (non-blocking: failure doesn't stop post creation).
 		$image_id = null;
 		$image_provider = $options['image_provider'] ?? 'none';
 
@@ -74,7 +80,7 @@ class Content_Generator {
 			}
 		}
 
-		// 5. Create the WordPress post.
+		// 6. Create the WordPress post.
 		$creator = new Post_Creator();
 		$post_id = $creator->create( $title, $content, $options, $image_id );
 
@@ -107,9 +113,10 @@ class Content_Generator {
 		$temperature = apply_filters( 'autoblog_ai_temperature', 0.7 );
 
 		// Increase timeout for long article generation.
-		add_filter( 'http_request_timeout', function ( $timeout ) {
+		$timeout_filter = function ( $timeout ) {
 			return max( $timeout, 120 );
-		} );
+		};
+		add_filter( 'http_request_timeout', $timeout_filter );
 
 		try {
 			$registry = \WordPress\AiClient\AiClient::defaultRegistry();
@@ -133,6 +140,8 @@ class Content_Generator {
 			throw $e;
 		} catch ( \Throwable $e ) {
 			throw new \RuntimeException( 'AI text generation failed: ' . $e->getMessage() );
+		} finally {
+			remove_filter( 'http_request_timeout', $timeout_filter );
 		}
 	}
 }

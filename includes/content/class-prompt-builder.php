@@ -33,7 +33,7 @@ class Prompt_Builder {
 		$parts[] = "Article format: {$article_type}.";
 		$parts[] = 'Write well-structured HTML content with proper headings (h2, h3), paragraphs, and lists where appropriate.';
 		$parts[] = 'Do NOT include the article title as an h1 — WordPress handles that.';
-		$parts[] = 'Use semantic HTML. Do not include <html>, <head>, or <body> tags.';
+		$parts[] = 'Use only simple HTML elements: p, h2, h3, h4, ul, ol, li, blockquote, strong, em, a. Do NOT use wrapper or semantic tags like section, article, div, figure, or header. Do not include <html>, <head>, or <body> tags.';
 
 		if ( $faq_count > 0 ) {
 			$parts[] = "Include a FAQ section at the end with exactly {$faq_count} questions and answers, using an h2 heading 'Frequently Asked Questions' and h3 for each question.";
