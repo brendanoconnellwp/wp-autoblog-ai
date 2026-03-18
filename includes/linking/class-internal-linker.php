@@ -193,7 +193,7 @@ class Internal_Linker {
 	 * @return string[] Lowercase keywords.
 	 */
 	private function extract_keywords( string $text ): array {
-		$text  = strtolower( strip_tags( $text ) );
+		$text  = strtolower( wp_strip_all_tags( $text ) );
 		$text  = preg_replace( '/[^a-z0-9\s]/', '', $text );
 		$words = preg_split( '/\s+/', $text, -1, PREG_SPLIT_NO_EMPTY );
 

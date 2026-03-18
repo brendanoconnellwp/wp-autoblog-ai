@@ -10,7 +10,7 @@
  * Author URI:        https://github.com/brendanoconnellwp
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       autoblog-ai
+ * Text Domain:       wp-autoblog-ai
  * Domain Path:       /languages
  */
 

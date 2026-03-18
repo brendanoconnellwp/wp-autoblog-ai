@@ -1,0 +1,13 @@
+.git
+.github
+.gitignore
+.distignore
+.wp-env.json
+node_modules
+package.json
+package-lock.json
+composer.json
+composer.lock
+blueprint.json
+README.md
+languages/.gitkeep

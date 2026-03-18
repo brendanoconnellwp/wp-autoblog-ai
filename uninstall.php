@@ -43,9 +43,9 @@ function autoblog_ai_uninstall_site(): void {
 }
 
 if ( is_multisite() ) {
-	$sites = get_sites( array( 'fields' => 'ids', 'number' => 0 ) );
-	foreach ( $sites as $site_id ) {
-		switch_to_blog( $site_id );
+	$autoblog_ai_sites = get_sites( array( 'fields' => 'ids', 'number' => 0 ) );
+	foreach ( $autoblog_ai_sites as $autoblog_ai_site_id ) {
+		switch_to_blog( $autoblog_ai_site_id );
 		autoblog_ai_uninstall_site();
 		restore_current_blog();
 	}

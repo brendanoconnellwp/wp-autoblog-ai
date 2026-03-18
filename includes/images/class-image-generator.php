@@ -71,7 +71,7 @@ class Image_Generator {
 		return match ( $provider ) {
 			'dall-e'    => ( new Dall_E_Provider() )->generate( $prompt ),
 			'stability' => ( new Stability_Provider() )->generate( $prompt, $style ),
-			default     => throw new \RuntimeException( "Unknown image provider: {$provider}" ),
+			default     => throw new \RuntimeException( 'Unknown image provider: ' . esc_html( $provider ) ),
 		};
 	}
 
@@ -103,7 +103,7 @@ class Image_Generator {
 		$upload   = wp_upload_bits( $filename, null, $data );
 
 		if ( ! empty( $upload['error'] ) ) {
-			throw new \RuntimeException( 'Media upload failed: ' . $upload['error'] );
+			throw new \RuntimeException( 'Media upload failed: ' . esc_html( $upload['error'] ) );
 		}
 
 		$attachment_id = wp_insert_attachment(
@@ -116,7 +116,7 @@ class Image_Generator {
 		);
 
 		if ( is_wp_error( $attachment_id ) ) {
-			throw new \RuntimeException( 'Failed to create attachment: ' . $attachment_id->get_error_message() );
+			throw new \RuntimeException( 'Failed to create attachment: ' . esc_html( $attachment_id->get_error_message() ) );
 		}
 
 		$metadata = wp_generate_attachment_metadata( $attachment_id, $upload['file'] );

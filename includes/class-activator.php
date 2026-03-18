@@ -25,11 +25,21 @@ class Activator {
 
 	/**
 	 * Run schema migrations if needed. Called on plugins_loaded.
+	 *
+	 * Also handles first-run bootstrap for sites that didn't go through
+	 * activate() — e.g. new sites on a network where the plugin is
+	 * already network-activated.
 	 */
 	public static function maybe_upgrade(): void {
-		$installed = (int) get_option( self::DB_VERSION_KEY, 1 );
+		$installed = (int) get_option( self::DB_VERSION_KEY, 0 );
 
 		if ( $installed >= self::CURRENT_DB_VERSION ) {
+			return;
+		}
+
+		// No version at all means this site has never been set up.
+		if ( 0 === $installed ) {
+			self::activate();
 			return;
 		}
 

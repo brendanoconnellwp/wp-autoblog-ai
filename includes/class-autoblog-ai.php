@@ -29,9 +29,6 @@ final class Autoblog_AI {
 	}
 
 	private function init_hooks(): void {
-		// i18n.
-		add_action( 'init', array( $this, 'load_textdomain' ) );
-
 		// Admin.
 		if ( is_admin() ) {
 			$admin = new Admin\Admin();
@@ -46,6 +43,9 @@ final class Autoblog_AI {
 		// Queue processor (front and back end — Action Scheduler can run via cron).
 		$processor = new Queue\Queue_Processor();
 		$processor->register();
+
+		// Multisite: bootstrap new sites when the plugin is network-activated.
+		add_action( 'wp_initialize_site', array( $this, 'on_new_site' ), 200 );
 	}
 
 	/**
@@ -57,21 +57,29 @@ final class Autoblog_AI {
 		}
 
 		$screen = get_current_screen();
-		if ( ! $screen || ! str_contains( $screen->id, 'autoblog-ai' ) ) {
+		if ( ! $screen || ! str_contains( $screen->id, 'wp-autoblog-ai' ) ) {
 			return;
 		}
 
 		printf(
 			'<div class="notice notice-error"><p>%s</p></div>',
-			esc_html__( 'AutoBlog AI requires the WordPress AI Client to generate articles. Please upgrade to WordPress 7.0+ or install the wp-ai-client plugin.', 'autoblog-ai' )
+			esc_html__( 'AutoBlog AI requires the WordPress AI Client to generate articles. Please upgrade to WordPress 7.0+ or install the wp-ai-client plugin.', 'wp-autoblog-ai' )
 		);
 	}
 
 	/**
-	 * Load the plugin text domain for translations.
+	 * Bootstrap the plugin on a newly created multisite site.
+	 *
+	 * @param \WP_Site $site New site object.
 	 */
-	public function load_textdomain(): void {
-		load_plugin_textdomain( 'autoblog-ai', false, dirname( AUTOBLOG_AI_PLUGIN_BASENAME ) . '/languages' );
+	public function on_new_site( \WP_Site $site ): void {
+		if ( ! is_plugin_active_for_network( AUTOBLOG_AI_PLUGIN_BASENAME ) ) {
+			return;
+		}
+
+		switch_to_blog( (int) $site->blog_id );
+		Activator::activate();
+		restore_current_blog();
 	}
 
 	/**

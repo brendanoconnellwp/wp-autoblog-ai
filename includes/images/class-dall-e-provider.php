@@ -57,7 +57,7 @@ class Dall_E_Provider {
 		} catch ( \RuntimeException $e ) {
 			throw $e;
 		} catch ( \Throwable $e ) {
-			throw new \RuntimeException( 'DALL-E generation failed: ' . $e->getMessage() );
+			throw new \RuntimeException( 'DALL-E generation failed: ' . esc_html( $e->getMessage() ) );
 		}
 	}
 }
