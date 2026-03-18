@@ -139,7 +139,7 @@ class Content_Generator {
 		} catch ( \RuntimeException $e ) {
 			throw $e;
 		} catch ( \Throwable $e ) {
-			throw new \RuntimeException( 'AI text generation failed: ' . $e->getMessage() );
+			throw new \RuntimeException( 'AI text generation failed: ' . esc_html( $e->getMessage() ) );
 		} finally {
 			remove_filter( 'http_request_timeout', $timeout_filter );
 		}

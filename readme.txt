@@ -1,6 +1,6 @@
 === AutoBlog AI ===
 Contributors: brendanoconnell
-Tags: ai, content generation, blogging, openai, gemini, claude
+Tags: ai, content generation, blogging, openai, gemini
 Requires at least: 7.0
 Tested up to: 7.0
 Requires PHP: 8.0

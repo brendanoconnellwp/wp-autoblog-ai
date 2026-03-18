@@ -61,7 +61,7 @@ class Stability_Provider {
 		) );
 
 		if ( is_wp_error( $response ) ) {
-			throw new \RuntimeException( 'Stability AI request failed: ' . $response->get_error_message() );
+			throw new \RuntimeException( 'Stability AI request failed: ' . esc_html( $response->get_error_message() ) );
 		}
 
 		$status = wp_remote_retrieve_response_code( $response );
@@ -69,7 +69,7 @@ class Stability_Provider {
 
 		if ( $status !== 200 ) {
 			$message = $data['message'] ?? "HTTP {$status}";
-			throw new \RuntimeException( 'Stability AI error: ' . $message );
+			throw new \RuntimeException( 'Stability AI error: ' . esc_html( $message ) );
 		}
 
 		if ( empty( $data['artifacts'][0]['base64'] ) ) {

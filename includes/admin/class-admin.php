@@ -36,28 +36,28 @@ class Admin {
 	 */
 	public function add_menu_pages(): void {
 		add_menu_page(
-			__( 'AutoBlog AI', 'autoblog-ai' ),
-			__( 'AutoBlog AI', 'autoblog-ai' ),
+			__( 'AutoBlog AI', 'wp-autoblog-ai' ),
+			__( 'AutoBlog AI', 'wp-autoblog-ai' ),
 			'manage_options',
-			'autoblog-ai',
+			'wp-autoblog-ai',
 			array( $this->generator_page, 'render' ),
 			'dashicons-edit-page',
 			30
 		);
 
 		add_submenu_page(
-			'autoblog-ai',
-			__( 'Article Generator', 'autoblog-ai' ),
-			__( 'Article Generator', 'autoblog-ai' ),
+			'wp-autoblog-ai',
+			__( 'Article Generator', 'wp-autoblog-ai' ),
+			__( 'Article Generator', 'wp-autoblog-ai' ),
 			'manage_options',
-			'autoblog-ai',
+			'wp-autoblog-ai',
 			array( $this->generator_page, 'render' )
 		);
 
 		add_submenu_page(
-			'autoblog-ai',
-			__( 'Settings', 'autoblog-ai' ),
-			__( 'Settings', 'autoblog-ai' ),
+			'wp-autoblog-ai',
+			__( 'Settings', 'wp-autoblog-ai' ),
+			__( 'Settings', 'wp-autoblog-ai' ),
 			'manage_options',
 			'autoblog-ai-settings',
 			array( $this->settings_page, 'render' )
@@ -91,23 +91,24 @@ class Admin {
 			'restUrl'  => rest_url( 'autoblog-ai/v1/' ),
 			'nonce'    => wp_create_nonce( 'wp_rest' ),
 			'i18n'     => array(
-				'generating'  => __( 'Generating...', 'autoblog-ai' ),
-				'queued'      => __( 'Queued', 'autoblog-ai' ),
-				'complete'    => __( 'Complete', 'autoblog-ai' ),
-				'failed'      => __( 'Failed', 'autoblog-ai' ),
-				'retry'       => __( 'Retry', 'autoblog-ai' ),
-				'delete'      => __( 'Delete', 'autoblog-ai' ),
-				'view'        => __( 'View Post', 'autoblog-ai' ),
-				'confirmDel'  => __( 'Delete this queue item?', 'autoblog-ai' ),
-				'noTitles'    => __( 'Please enter at least one article title.', 'autoblog-ai' ),
-				'submitError' => __( 'Failed to submit articles. Please try again.', 'autoblog-ai' ),
-				'emptyQueue'  => __( 'No articles in the queue. Submit titles to get started.', 'autoblog-ai' ),
-				'colTitle'       => __( 'Title', 'autoblog-ai' ),
-				'colStatus'      => __( 'Status', 'autoblog-ai' ),
-				'colActions'     => __( 'Actions', 'autoblog-ai' ),
-				'clearQueue'     => __( 'Clear Finished', 'autoblog-ai' ),
-				'confirmClear'   => __( 'Remove all completed and failed items from the queue?', 'autoblog-ai' ),
-				'tooManyTitles'  => sprintf( __( 'Too many titles. Maximum is %d per batch.', 'autoblog-ai' ), 50 ),
+				'generating'  => __( 'Generating...', 'wp-autoblog-ai' ),
+				'queued'      => __( 'Queued', 'wp-autoblog-ai' ),
+				'complete'    => __( 'Complete', 'wp-autoblog-ai' ),
+				'failed'      => __( 'Failed', 'wp-autoblog-ai' ),
+				'retry'       => __( 'Retry', 'wp-autoblog-ai' ),
+				'delete'      => __( 'Delete', 'wp-autoblog-ai' ),
+				'view'        => __( 'View Post', 'wp-autoblog-ai' ),
+				'confirmDel'  => __( 'Delete this queue item?', 'wp-autoblog-ai' ),
+				'noTitles'    => __( 'Please enter at least one article title.', 'wp-autoblog-ai' ),
+				'submitError' => __( 'Failed to submit articles. Please try again.', 'wp-autoblog-ai' ),
+				'emptyQueue'  => __( 'No articles in the queue. Submit titles to get started.', 'wp-autoblog-ai' ),
+				'colTitle'       => __( 'Title', 'wp-autoblog-ai' ),
+				'colStatus'      => __( 'Status', 'wp-autoblog-ai' ),
+				'colActions'     => __( 'Actions', 'wp-autoblog-ai' ),
+				'clearQueue'     => __( 'Clear Finished', 'wp-autoblog-ai' ),
+				'confirmClear'   => __( 'Remove all completed and failed items from the queue?', 'wp-autoblog-ai' ),
+				/* translators: %d: maximum number of titles allowed per batch */
+				'tooManyTitles'  => sprintf( __( 'Too many titles. Maximum is %d per batch.', 'wp-autoblog-ai' ), 50 ),
 			),
 		) );
 	}
@@ -116,6 +117,6 @@ class Admin {
 	 * Check if we are on a plugin admin page.
 	 */
 	private function is_plugin_page( string $hook_suffix ): bool {
-		return str_contains( $hook_suffix, 'autoblog-ai' );
+		return str_contains( $hook_suffix, 'wp-autoblog-ai' );
 	}
 }

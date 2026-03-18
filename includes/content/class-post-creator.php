@@ -48,7 +48,7 @@ class Post_Creator {
 		$post_id = wp_insert_post( $post_args, true );
 
 		if ( is_wp_error( $post_id ) ) {
-			throw new \RuntimeException( 'Failed to create post: ' . $post_id->get_error_message() );
+			throw new \RuntimeException( 'Failed to create post: ' . esc_html( $post_id->get_error_message() ) ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 		}
 
 		// Tags.
