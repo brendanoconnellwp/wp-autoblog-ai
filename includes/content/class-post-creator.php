@@ -24,7 +24,7 @@ class Post_Creator {
 	public function create( string $title, string $content, array $options, ?int $image_id = null ): int {
 		$post_args = array(
 			'post_title'   => sanitize_text_field( $title ),
-			'post_content' => wp_kses_post( $content ),
+			'post_content' => $content,
 			'post_status'  => $this->sanitize_status( $options['post_status'] ?? 'draft' ),
 			'post_type'    => 'post',
 			'post_author'  => get_current_user_id() ?: 1,

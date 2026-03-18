@@ -2,6 +2,8 @@
 
 namespace Autoblog_AI\Queue;
 
+use Autoblog_AI\Content\Title_Formatter;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -38,6 +40,8 @@ class Queue_Manager {
 			if ( '' === $title ) {
 				continue;
 			}
+
+			$title = Title_Formatter::format( $title );
 
 			$wpdb->insert(
 				$table,
@@ -171,7 +175,11 @@ class Queue_Manager {
 
 		// Cancel scheduled action if pending.
 		if ( $item && $item->action_id && function_exists( 'as_unschedule_action' ) ) {
-			as_unschedule_action( 'autoblog_ai_process_article', array( 'queue_id' => $queue_id ), 'autoblog-ai' );
+			try {
+				as_unschedule_action( 'autoblog_ai_process_article', array( 'queue_id' => $queue_id ), 'autoblog-ai' );
+			} catch ( \Throwable $e ) {
+				// Action may already be complete or cancelled — safe to ignore.
+			}
 		}
 
 		$result = $wpdb->delete( self::table(), array( 'id' => $queue_id ), array( '%d' ) );

@@ -1,13 +1,13 @@
 <?php
 /**
  * Plugin Name:       AutoBlog AI
- * Plugin URI:        https://example.com/autoblog-ai
+ * Plugin URI:        https://github.com/brendanoconnellwp/wp-autoblog-ai
  * Description:       AI-powered bulk article generator using the WordPress AI Client SDK. Supports OpenAI, Anthropic, and Google Gemini for text, plus DALL-E and Stability AI for images.
  * Version:           1.3.0
  * Requires at least: 6.4
  * Requires PHP:      8.0
- * Author:            AutoBlog AI
- * Author URI:        https://example.com
+ * Author:            Brendan O'Connell
+ * Author URI:        https://github.com/brendanoconnellwp
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       autoblog-ai
@@ -27,6 +27,11 @@ define( 'AUTOBLOG_AI_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 // Composer autoloader.
 if ( file_exists( AUTOBLOG_AI_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
 	require_once AUTOBLOG_AI_PLUGIN_DIR . 'vendor/autoload.php';
+}
+
+// Bootstrap Action Scheduler.
+if ( file_exists( AUTOBLOG_AI_PLUGIN_DIR . 'vendor/woocommerce/action-scheduler/action-scheduler.php' ) ) {
+	require_once AUTOBLOG_AI_PLUGIN_DIR . 'vendor/woocommerce/action-scheduler/action-scheduler.php';
 }
 
 // Plugin class autoloader.

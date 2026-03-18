@@ -58,10 +58,17 @@
 			contentType: 'application/json',
 			data: JSON.stringify(payload),
 		})
-			.done(function () {
+			.done(function (response) {
 				$('#autoblog-ai-titles').val('');
+				showNotice(response.message || autoblogAI.i18n.queued);
 				refreshQueue();
 				startPolling();
+
+				// Scroll to the queue on mobile where columns stack.
+				var $queue = $('#autoblog-ai-queue');
+				if ($queue.length && $(window).width() <= 960) {
+					$('html, body').animate({ scrollTop: $queue.offset().top - 40 }, 300);
+				}
 			})
 			.fail(function () {
 				alert(autoblogAI.i18n.submitError);
@@ -176,7 +183,7 @@
 	 * Handle retry click.
 	 */
 	function handleRetry(e) {
-		var id = $(e.target).data('id');
+		var id = $(e.target).closest('.retry-action').data('id');
 		$.ajax({
 			url: autoblogAI.restUrl + 'queue/' + id + '/retry',
 			method: 'POST',
@@ -191,16 +198,20 @@
 	 * Handle delete click.
 	 */
 	function handleDelete(e) {
-		var id = $(e.target).data('id');
-		if (!confirm(autoblogAI.i18n.confirmDel)) {
+		var $btn = $(e.target).closest('.delete-action');
+		var id = $btn.data('id');
+		if (!id || !confirm(autoblogAI.i18n.confirmDel)) {
 			return;
 		}
+		$btn.prop('disabled', true);
 		$.ajax({
 			url: autoblogAI.restUrl + 'queue/' + id,
 			method: 'DELETE',
 			headers: { 'X-WP-Nonce': autoblogAI.nonce },
 		}).done(function () {
 			refreshQueue();
+		}).fail(function () {
+			$btn.prop('disabled', false);
 		});
 	}
 
@@ -224,6 +235,19 @@
 			pollTimer = null;
 		}
 		isPolling = false;
+	}
+
+	/**
+	 * Show a temporary success notice above the queue.
+	 */
+	function showNotice(message) {
+		var $queue = $('.generator-queue-column .autoblog-ai-card');
+		$queue.find('.autoblog-ai-inline-notice').remove();
+		var $notice = $('<div class="autoblog-ai-inline-notice">' + escHtml(message) + '</div>');
+		$queue.find('h2').after($notice);
+		setTimeout(function () {
+			$notice.fadeOut(300, function () { $notice.remove(); });
+		}, 4000);
 	}
 
 	/**
