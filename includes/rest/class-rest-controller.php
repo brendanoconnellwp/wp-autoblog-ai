@@ -59,6 +59,12 @@ class Rest_Controller {
 				),
 			),
 		) );
+
+		register_rest_route( self::NAMESPACE, '/queue/clear', array(
+			'methods'             => 'POST',
+			'callback'            => array( $this, 'clear_queue' ),
+			'permission_callback' => array( $this, 'check_permission' ),
+		) );
 	}
 
 	/**
@@ -71,11 +77,19 @@ class Rest_Controller {
 	/**
 	 * POST /generate — Add a batch of titles to the queue.
 	 */
+	private const MAX_BATCH_SIZE = 50;
+
 	public function generate( \WP_REST_Request $request ): \WP_REST_Response {
 		$titles = $request->get_param( 'titles' );
 
 		if ( ! is_array( $titles ) || empty( $titles ) ) {
 			return new \WP_REST_Response( array( 'message' => 'No titles provided.' ), 400 );
+		}
+
+		if ( count( $titles ) > self::MAX_BATCH_SIZE ) {
+			return new \WP_REST_Response( array(
+				'message' => sprintf( 'Too many titles. Maximum is %d per batch.', self::MAX_BATCH_SIZE ),
+			), 400 );
 		}
 
 		$options = array(
@@ -109,6 +123,9 @@ class Rest_Controller {
 	 * GET /queue — Return current queue items.
 	 */
 	public function get_queue(): \WP_REST_Response {
+		// Auto-prune items older than 30 days to prevent unbounded table growth.
+		Queue_Manager::prune_old( 30 );
+
 		$items = Queue_Manager::get_items( 50 );
 
 		$data = array_map( function ( $item ) {
@@ -153,6 +170,18 @@ class Rest_Controller {
 		}
 
 		return new \WP_REST_Response( array( 'message' => 'Item deleted.' ) );
+	}
+
+	/**
+	 * POST /queue/clear — Remove all completed and failed items.
+	 */
+	public function clear_queue(): \WP_REST_Response {
+		$deleted = Queue_Manager::clear_finished();
+
+		return new \WP_REST_Response( array(
+			'message' => sprintf( '%d item(s) cleared.', $deleted ),
+			'deleted' => $deleted,
+		) );
 	}
 
 	/**

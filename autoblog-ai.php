@@ -3,8 +3,8 @@
  * Plugin Name:       AutoBlog AI
  * Plugin URI:        https://github.com/brendanoconnellwp/wp-autoblog-ai
  * Description:       AI-powered bulk article generator using the WordPress AI Client SDK. Supports OpenAI, Anthropic, and Google Gemini for text, plus DALL-E and Stability AI for images.
- * Version:           1.3.1
- * Requires at least: 6.4
+ * Version:           1.3.2
+ * Requires at least: 7.0
  * Requires PHP:      8.0
  * Author:            Brendan O'Connell
  * Author URI:        https://github.com/brendanoconnellwp
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'AUTOBLOG_AI_VERSION', '1.3.1' );
+define( 'AUTOBLOG_AI_VERSION', '1.3.2' );
 define( 'AUTOBLOG_AI_PLUGIN_FILE', __FILE__ );
 define( 'AUTOBLOG_AI_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'AUTOBLOG_AI_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -67,6 +67,7 @@ register_deactivation_hook( __FILE__, array( 'Autoblog_AI\\Deactivator', 'deacti
  * Boot the plugin after all plugins are loaded.
  */
 function autoblog_ai_init() {
+	Autoblog_AI\Activator::maybe_upgrade();
 	Autoblog_AI\Autoblog_AI::get_instance();
 }
 add_action( 'plugins_loaded', 'autoblog_ai_init' );

@@ -7,9 +7,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Handles plugin activation: creates the queue table and sets default options.
+ * Handles plugin activation and schema upgrades.
  */
 class Activator {
+
+	private const DB_VERSION_KEY     = 'autoblog_ai_db_version';
+	private const CURRENT_DB_VERSION = 2;
 
 	/**
 	 * Run on plugin activation.
@@ -17,6 +20,42 @@ class Activator {
 	public static function activate(): void {
 		self::create_queue_table();
 		self::set_default_options();
+		update_option( self::DB_VERSION_KEY, self::CURRENT_DB_VERSION );
+	}
+
+	/**
+	 * Run schema migrations if needed. Called on plugins_loaded.
+	 */
+	public static function maybe_upgrade(): void {
+		$installed = (int) get_option( self::DB_VERSION_KEY, 1 );
+
+		if ( $installed >= self::CURRENT_DB_VERSION ) {
+			return;
+		}
+
+		if ( $installed < 2 ) {
+			self::upgrade_to_v2();
+		}
+
+		update_option( self::DB_VERSION_KEY, self::CURRENT_DB_VERSION );
+	}
+
+	/**
+	 * v2: Add user_id column to queue table.
+	 */
+	private static function upgrade_to_v2(): void {
+		global $wpdb;
+
+		$table = $wpdb->prefix . 'autoblog_queue';
+
+		// Check if column already exists (e.g. fresh install with new schema).
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$column = $wpdb->get_results( "SHOW COLUMNS FROM {$table} LIKE 'user_id'" );
+
+		if ( empty( $column ) ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->query( "ALTER TABLE {$table} ADD COLUMN user_id BIGINT(20) UNSIGNED NOT NULL DEFAULT 1 AFTER options" );
+		}
 	}
 
 	/**
@@ -32,6 +71,7 @@ class Activator {
 			id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 			title VARCHAR(255) NOT NULL DEFAULT '',
 			options LONGTEXT NOT NULL,
+			user_id BIGINT(20) UNSIGNED NOT NULL DEFAULT 1,
 			status VARCHAR(20) NOT NULL DEFAULT 'queued',
 			post_id BIGINT(20) UNSIGNED DEFAULT NULL,
 			error_message TEXT DEFAULT NULL,

@@ -1,10 +1,10 @@
 === AutoBlog AI ===
 Contributors: brendanoconnell
 Tags: ai, content generation, blogging, openai, gemini, claude
-Requires at least: 6.4
+Requires at least: 7.0
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -35,7 +35,7 @@ Text generation uses the WordPress AI Client SDK (BYOK model). Image generation 
 
 = Requirements =
 
-* WordPress 6.4+
+* WordPress 7.0+ (or WordPress 6.4+ with the wp-ai-client plugin)
 * PHP 8.0+
 * Valid AI provider credentials for text generation
 * Stability AI key only if using Stability for images
@@ -71,7 +71,34 @@ Each submitted title becomes a queue item and is scheduled with Action Scheduler
 
 Yes. Internal linking can be toggled in the generator form and in `AutoBlog AI -> Settings`.
 
+== Privacy ==
+
+This plugin sends data to external AI services to generate content:
+
+* **Text generation**: Article titles, writing prompts, and internal-link context are sent to the AI provider configured in WordPress AI Client (e.g., OpenAI, Anthropic, or Google Gemini).
+* **Image generation (DALL-E)**: Image prompts derived from article titles are sent to OpenAI via the WordPress AI Client.
+* **Image generation (Stability AI)**: Image prompts derived from article titles are sent directly to the Stability AI API (`api.stability.ai`).
+
+No data is sent unless you actively trigger article generation. Please review each provider's privacy policy and terms of service before use.
+
 == Changelog ==
+
+= 1.3.2 =
+* Fixed minimum WordPress version requirement (now 7.0+).
+* Fixed async queue jobs attributing posts to the wrong author.
+* Added i18n bootstrapping with load_plugin_textdomain.
+* Added privacy disclosure for external AI service usage.
+* Improved queue insert error handling.
+* Upgraded encryption from AES-CBC to AES-GCM with backwards compatibility.
+* Added automatic DB migration system for schema upgrades.
+* Added batch size limit (max 50 titles) and within-batch dedup.
+* Added concurrency limiter for background article generation.
+* Added queue cleanup: auto-prune after 30 days, bulk "Clear Finished" button.
+* Added admin notice when WordPress AI Client dependency is missing.
+* Rewrote Block_Converter to use DOMDocument for reliable HTML parsing.
+* Optimized Internal_Linker with query caching and reduced meta/term cache loading.
+* Improved JS error handling for expired nonces and server error messages.
+* Multisite-aware uninstall cleanup.
 
 = 1.3.0 =
 * Migrated to WordPress 7.0 native AI Client API.
@@ -88,6 +115,9 @@ Yes. Internal linking can be toggled in the generator form and in `AutoBlog AI -
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.3.2 =
+Fixes author attribution on async jobs, raises minimum WP to 7.0, adds queue cleanup and concurrency limits. DB schema upgrades automatically.
 
 = 1.3.0 =
 Requires WordPress 7.0+ or the wp-ai-client plugin for text generation.

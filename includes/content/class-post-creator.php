@@ -27,7 +27,7 @@ class Post_Creator {
 			'post_content' => $content,
 			'post_status'  => $this->sanitize_status( $options['post_status'] ?? 'draft' ),
 			'post_type'    => 'post',
-			'post_author'  => get_current_user_id() ?: 1,
+			'post_author'  => absint( $options['post_author'] ?? 0 ) ?: ( get_current_user_id() ?: 1 ),
 		);
 
 		// Category.

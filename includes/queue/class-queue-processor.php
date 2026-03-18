@@ -10,8 +10,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Action Scheduler callback handler. Processes one article at a time.
+ *
+ * Uses a transient-based concurrency limit to prevent multiple jobs
+ * from hammering the AI API simultaneously.
  */
 class Queue_Processor {
+
+	/**
+	 * Maximum number of articles generating concurrently.
+	 * Filterable via 'autoblog_ai_max_concurrent'.
+	 */
+	private const DEFAULT_MAX_CONCURRENT = 2;
+
+	private const CONCURRENCY_TRANSIENT = 'autoblog_ai_active_jobs';
 
 	/**
 	 * Register the Action Scheduler hook.
@@ -37,6 +48,12 @@ class Queue_Processor {
 			return;
 		}
 
+		// Concurrency gate: if too many jobs are running, re-schedule for later.
+		if ( ! $this->acquire_slot() ) {
+			Queue_Manager::schedule_item( $queue_id );
+			return;
+		}
+
 		Queue_Manager::mark_generating( $queue_id );
 
 		/**
@@ -51,6 +68,9 @@ class Queue_Processor {
 			if ( ! is_array( $options ) ) {
 				throw new \RuntimeException( 'Invalid queue item options.' );
 			}
+
+			// Pass the submitting user so the post is attributed correctly.
+			$options['post_author'] = (int) ( $item->user_id ?? 1 );
 
 			$generator = new Content_Generator();
 			$post_id   = $generator->generate( $item->title, $options );
@@ -76,6 +96,40 @@ class Queue_Processor {
 			 * @param object $item  Queue item.
 			 */
 			do_action( 'autoblog_ai_article_failed', $error, $item );
+		} finally {
+			$this->release_slot();
+		}
+	}
+
+	/**
+	 * Try to acquire a concurrency slot.
+	 *
+	 * @return bool True if a slot was acquired.
+	 */
+	private function acquire_slot(): bool {
+		/** @var int $max */
+		$max     = (int) apply_filters( 'autoblog_ai_max_concurrent', self::DEFAULT_MAX_CONCURRENT );
+		$current = (int) get_transient( self::CONCURRENCY_TRANSIENT );
+
+		if ( $current >= $max ) {
+			return false;
+		}
+
+		set_transient( self::CONCURRENCY_TRANSIENT, $current + 1, 10 * MINUTE_IN_SECONDS );
+		return true;
+	}
+
+	/**
+	 * Release a concurrency slot.
+	 */
+	private function release_slot(): void {
+		$current = (int) get_transient( self::CONCURRENCY_TRANSIENT );
+		$new     = max( 0, $current - 1 );
+
+		if ( 0 === $new ) {
+			delete_transient( self::CONCURRENCY_TRANSIENT );
+		} else {
+			set_transient( self::CONCURRENCY_TRANSIENT, $new, 10 * MINUTE_IN_SECONDS );
 		}
 	}
 }

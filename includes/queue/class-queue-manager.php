@@ -35,6 +35,12 @@ class Queue_Manager {
 		$ids   = array();
 		$now   = current_time( 'mysql', true );
 
+		// Capture the submitting user now so async processing attributes posts correctly.
+		$user_id = get_current_user_id() ?: 1;
+
+		// Deduplicate titles within the batch.
+		$seen = array();
+
 		foreach ( $titles as $title ) {
 			$title = sanitize_text_field( $title );
 			if ( '' === $title ) {
@@ -43,19 +49,35 @@ class Queue_Manager {
 
 			$title = Title_Formatter::format( $title );
 
-			$wpdb->insert(
+			// Skip duplicate titles within this batch.
+			$title_key = strtolower( $title );
+			if ( isset( $seen[ $title_key ] ) ) {
+				continue;
+			}
+			$seen[ $title_key ] = true;
+
+			$result = $wpdb->insert(
 				$table,
 				array(
 					'title'      => $title,
 					'options'    => wp_json_encode( $options ),
 					'status'     => 'queued',
+					'user_id'    => $user_id,
 					'created_at' => $now,
 				),
-				array( '%s', '%s', '%s', '%s' )
+				array( '%s', '%s', '%s', '%d', '%s' )
 			);
 
+			if ( false === $result ) {
+				continue;
+			}
+
 			$queue_id = (int) $wpdb->insert_id;
-			$ids[]    = $queue_id;
+			if ( 0 === $queue_id ) {
+				continue;
+			}
+
+			$ids[] = $queue_id;
 
 			// Schedule via Action Scheduler.
 			self::schedule_item( $queue_id );
@@ -211,5 +233,41 @@ class Queue_Manager {
 		$table = self::table();
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		return $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} ORDER BY id DESC LIMIT %d", $limit ) );
+	}
+
+	/**
+	 * Delete all completed and failed items from the queue.
+	 *
+	 * @return int Number of rows deleted.
+	 */
+	public static function clear_finished(): int {
+		global $wpdb;
+
+		$table = self::table();
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$deleted = $wpdb->query( "DELETE FROM {$table} WHERE status IN ('complete', 'failed')" );
+
+		return max( 0, (int) $deleted );
+	}
+
+	/**
+	 * Prune completed/failed items older than a given number of days.
+	 *
+	 * @param int $days Age threshold in days.
+	 * @return int Number of rows deleted.
+	 */
+	public static function prune_old( int $days = 30 ): int {
+		global $wpdb;
+
+		$table    = self::table();
+		$cutoff   = gmdate( 'Y-m-d H:i:s', time() - ( $days * DAY_IN_SECONDS ) );
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$deleted = $wpdb->query( $wpdb->prepare(
+			"DELETE FROM {$table} WHERE status IN ('complete', 'failed') AND completed_at < %s",
+			$cutoff
+		) );
+
+		return max( 0, (int) $deleted );
 	}
 }

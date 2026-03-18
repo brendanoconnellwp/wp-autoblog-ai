@@ -7,9 +7,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Converts raw HTML into Gutenberg block markup.
+ * Converts raw HTML into Gutenberg block markup using DOMDocument
+ * for reliable parsing of nested/malformed AI output.
  */
 class Block_Converter {
+
+	/**
+	 * Wrapper tags that should be stripped (content kept, tag removed).
+	 */
+	private const WRAPPER_TAGS = array( 'section', 'article', 'div', 'main', 'figure', 'header', 'footer' );
 
 	/**
 	 * Convert HTML content to Gutenberg block markup.
@@ -18,23 +24,29 @@ class Block_Converter {
 	 * @return string Block-formatted content.
 	 */
 	public static function convert( string $html ): string {
-		// Strip wrapper tags that the AI might include.
-		$html = self::strip_wrappers( $html );
+		$html = trim( $html );
+		if ( '' === $html ) {
+			return '';
+		}
 
-		// Normalize whitespace between tags.
-		$html = preg_replace( '/>\s+</', ">\n<", trim( $html ) );
+		$doc = self::load_html( $html );
+		if ( ! $doc ) {
+			// Fallback: return as a single paragraph block.
+			return "<!-- wp:paragraph -->\n<p>" . wp_kses_post( $html ) . "</p>\n<!-- /wp:paragraph -->";
+		}
 
-		// Split into top-level elements and convert each to a block.
+		$body = $doc->getElementsByTagName( 'body' )->item( 0 );
+		if ( ! $body ) {
+			return '';
+		}
+
+		// Flatten wrapper tags first.
+		self::strip_wrappers( $doc, $body );
+
 		$blocks = array();
-		$chunks = self::split_top_level_elements( $html );
 
-		foreach ( $chunks as $chunk ) {
-			$chunk = trim( $chunk );
-			if ( '' === $chunk ) {
-				continue;
-			}
-
-			$block = self::element_to_block( $chunk );
+		foreach ( $body->childNodes as $node ) {
+			$block = self::node_to_block( $node, $doc );
 			if ( '' !== $block ) {
 				$blocks[] = $block;
 			}
@@ -44,105 +56,108 @@ class Block_Converter {
 	}
 
 	/**
-	 * Strip wrapper elements (section, article, div, main) but keep their inner content.
+	 * Load HTML into a DOMDocument.
 	 */
-	private static function strip_wrappers( string $html ): string {
-		// Repeatedly strip outermost wrapper tags.
-		$wrapper_tags = array( 'section', 'article', 'div', 'main', 'figure', 'header', 'footer' );
-		$pattern      = '/^<(' . implode( '|', $wrapper_tags ) . ')[^>]*>(.*)<\/\1>\s*$/is';
+	private static function load_html( string $html ): ?\DOMDocument {
+		$doc = new \DOMDocument( '1.0', 'UTF-8' );
 
-		$prev = '';
-		while ( $prev !== $html ) {
-			$prev = $html;
-			$html = preg_replace( $pattern, '$2', $html );
-		}
+		// Wrap in a root element to handle fragments, force UTF-8.
+		$wrapped = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body>' . $html . '</body></html>';
 
-		// Also strip inline wrapper tags that appear mid-content.
-		foreach ( $wrapper_tags as $tag ) {
-			$html = preg_replace( '/<' . $tag . '[^>]*>/i', '', $html );
-			$html = preg_replace( '/<\/' . $tag . '>/i', '', $html );
-		}
+		$prev = libxml_use_internal_errors( true );
+		$doc->loadHTML( $wrapped, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+		libxml_clear_errors();
+		libxml_use_internal_errors( $prev );
 
-		return trim( $html );
+		return $doc;
 	}
 
 	/**
-	 * Split HTML into top-level elements.
-	 *
-	 * Handles self-closing and block-level elements.
+	 * Recursively unwrap wrapper elements, replacing them with their children.
 	 */
-	private static function split_top_level_elements( string $html ): array {
-		// Match top-level HTML elements (opening tag through closing tag) or text nodes.
-		preg_match_all(
-			'/<(p|h[1-6]|ul|ol|blockquote|table|pre|hr|img)(?:\s[^>]*)?>.*?<\/\1>|<(hr|img)(?:\s[^>]*)?\/?\s*>|[^<]+/is',
-			$html,
-			$matches
-		);
+	private static function strip_wrappers( \DOMDocument $doc, \DOMNode $parent ): void {
+		$to_unwrap = array();
 
-		return $matches[0] ?? array();
+		foreach ( $parent->childNodes as $child ) {
+			if ( $child instanceof \DOMElement && in_array( strtolower( $child->tagName ), self::WRAPPER_TAGS, true ) ) {
+				$to_unwrap[] = $child;
+			}
+		}
+
+		foreach ( $to_unwrap as $wrapper ) {
+			// Move all children of the wrapper before the wrapper itself.
+			while ( $wrapper->firstChild ) {
+				$wrapper->parentNode->insertBefore( $wrapper->firstChild, $wrapper );
+			}
+			$wrapper->parentNode->removeChild( $wrapper );
+		}
+
+		// Recurse in case wrappers were nested.
+		if ( ! empty( $to_unwrap ) ) {
+			self::strip_wrappers( $doc, $parent );
+		}
 	}
 
 	/**
-	 * Convert a single HTML element to its Gutenberg block equivalent.
+	 * Get the outer HTML of a DOMNode.
 	 */
-	private static function element_to_block( string $element ): string {
-		$element = trim( $element );
+	private static function outer_html( \DOMNode $node, \DOMDocument $doc ): string {
+		return $doc->saveHTML( $node );
+	}
 
-		// Skip plain text that isn't wrapped in a tag.
-		if ( ! preg_match( '/^<(\w+)/', $element, $m ) ) {
-			// If it's meaningful text, wrap it as a paragraph.
-			$text = trim( strip_tags( $element ) );
+	/**
+	 * Convert a single DOM node to its Gutenberg block equivalent.
+	 */
+	private static function node_to_block( \DOMNode $node, \DOMDocument $doc ): string {
+		// Skip whitespace-only text nodes.
+		if ( $node instanceof \DOMText ) {
+			$text = trim( $node->textContent );
 			if ( '' === $text ) {
 				return '';
 			}
-			return "<!-- wp:paragraph -->\n<p>{$element}</p>\n<!-- /wp:paragraph -->";
+			return "<!-- wp:paragraph -->\n<p>" . esc_html( $text ) . "</p>\n<!-- /wp:paragraph -->";
 		}
 
-		$tag = strtolower( $m[1] );
+		if ( ! ( $node instanceof \DOMElement ) ) {
+			return '';
+		}
+
+		$tag  = strtolower( $node->tagName );
+		$html = self::outer_html( $node, $doc );
 
 		return match ( $tag ) {
-			'p'          => "<!-- wp:paragraph -->\n{$element}\n<!-- /wp:paragraph -->",
-			'h2'         => "<!-- wp:heading -->\n{$element}\n<!-- /wp:heading -->",
-			'h3'         => "<!-- wp:heading {\"level\":3} -->\n{$element}\n<!-- /wp:heading -->",
-			'h4'         => "<!-- wp:heading {\"level\":4} -->\n{$element}\n<!-- /wp:heading -->",
-			'h5'         => "<!-- wp:heading {\"level\":5} -->\n{$element}\n<!-- /wp:heading -->",
-			'h6'         => "<!-- wp:heading {\"level\":6} -->\n{$element}\n<!-- /wp:heading -->",
-			'ul'         => self::convert_list( $element, false ),
-			'ol'         => self::convert_list( $element, true ),
-			'blockquote' => "<!-- wp:quote -->\n{$element}\n<!-- /wp:quote -->",
-			'table'      => "<!-- wp:table -->\n<figure class=\"wp-block-table\">{$element}</figure>\n<!-- /wp:table -->",
-			'pre'        => "<!-- wp:preformatted -->\n{$element}\n<!-- /wp:preformatted -->",
+			'p'          => "<!-- wp:paragraph -->\n{$html}\n<!-- /wp:paragraph -->",
+			'h2'         => "<!-- wp:heading -->\n{$html}\n<!-- /wp:heading -->",
+			'h3'         => "<!-- wp:heading {\"level\":3} -->\n{$html}\n<!-- /wp:heading -->",
+			'h4'         => "<!-- wp:heading {\"level\":4} -->\n{$html}\n<!-- /wp:heading -->",
+			'h5'         => "<!-- wp:heading {\"level\":5} -->\n{$html}\n<!-- /wp:heading -->",
+			'h6'         => "<!-- wp:heading {\"level\":6} -->\n{$html}\n<!-- /wp:heading -->",
+			'ul'         => self::convert_list( $node, $doc, false ),
+			'ol'         => self::convert_list( $node, $doc, true ),
+			'blockquote' => "<!-- wp:quote -->\n{$html}\n<!-- /wp:quote -->",
+			'table'      => "<!-- wp:table -->\n<figure class=\"wp-block-table\">{$html}</figure>\n<!-- /wp:table -->",
+			'pre'        => "<!-- wp:preformatted -->\n{$html}\n<!-- /wp:preformatted -->",
 			'hr'         => "<!-- wp:separator -->\n<hr class=\"wp-block-separator has-alpha-channel-opacity\"/>\n<!-- /wp:separator -->",
-			'img'        => self::convert_image( $element ),
-			default      => $element,
+			'img'        => "<!-- wp:image -->\n<figure class=\"wp-block-image\">{$html}</figure>\n<!-- /wp:image -->",
+			default      => $html,
 		};
 	}
 
 	/**
-	 * Convert a list element to a Gutenberg list block.
+	 * Convert a list element to a Gutenberg list block with wp:list-item wrappers.
 	 */
-	private static function convert_list( string $html, bool $ordered ): string {
-		// Extract list items and wrap each in wp:list-item.
-		$inner = preg_replace_callback(
-			'/<li[^>]*>(.*?)<\/li>/is',
-			function ( $m ) {
-				return "<!-- wp:list-item -->\n<li>{$m[1]}</li>\n<!-- /wp:list-item -->";
-			},
-			$html
-		);
+	private static function convert_list( \DOMElement $list, \DOMDocument $doc, bool $ordered ): string {
+		$tag   = $ordered ? 'ol' : 'ul';
+		$inner = '';
 
-		// Replace the outer tag to include the inner block items.
-		$tag = $ordered ? 'ol' : 'ul';
-		$inner = preg_replace( '/<' . $tag . '[^>]*>/i', "<{$tag}>", $inner );
+		foreach ( $list->childNodes as $child ) {
+			if ( $child instanceof \DOMElement && 'li' === strtolower( $child->tagName ) ) {
+				$li_html = $doc->saveHTML( $child );
+				$inner  .= "<!-- wp:list-item -->\n{$li_html}\n<!-- /wp:list-item -->\n";
+			}
+		}
 
 		$attrs = $ordered ? ' {"ordered":true}' : '';
-		return "<!-- wp:list{$attrs} -->\n{$inner}\n<!-- /wp:list -->";
-	}
-
-	/**
-	 * Convert an image element to a Gutenberg image block.
-	 */
-	private static function convert_image( string $html ): string {
-		return "<!-- wp:image -->\n<figure class=\"wp-block-image\">{$html}</figure>\n<!-- /wp:image -->";
+		return "<!-- wp:list{$attrs} -->\n<{$tag}>\n{$inner}</{$tag}>\n<!-- /wp:list -->";
 	}
 }
