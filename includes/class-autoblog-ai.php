@@ -57,13 +57,13 @@ final class Autoblog_AI {
 		}
 
 		$screen = get_current_screen();
-		if ( ! $screen || ! str_contains( $screen->id, 'wp-autoblog-ai' ) ) {
+		if ( ! $screen || ! str_contains( $screen->id, 'autoblog-ai' ) ) {
 			return;
 		}
 
 		printf(
 			'<div class="notice notice-error"><p>%s</p></div>',
-			esc_html__( 'AutoBlog AI requires the WordPress AI Client to generate articles. Please upgrade to WordPress 7.0+ or install the wp-ai-client plugin.', 'wp-autoblog-ai' )
+			esc_html__( 'AutoBlog AI requires the WordPress AI Client to generate articles. Please upgrade to WordPress 7.0+ or install the wp-ai-client plugin.', 'autoblog-ai' )
 		);
 	}
 
