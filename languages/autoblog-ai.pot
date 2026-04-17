@@ -10,7 +10,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "PO-Revision-Date: 2026-04-17 18:42+0000\n"
 "Language-Team: \n"
-"X-Domain: wp-autoblog-ai\n"
+"X-Domain: autoblog-ai\n"
 
 #: templates/generator-page.php:19
 msgid "10 Best WordPress Plugins in 2025\nHow to Speed Up Your Website\nComplete Guide to SEO for Beginners"

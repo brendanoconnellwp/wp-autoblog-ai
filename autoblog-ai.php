@@ -10,7 +10,7 @@
  * Author URI:        https://github.com/brendanoconnellwp
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       wp-autoblog-ai
+ * Text Domain:       autoblog-ai
  * Domain Path:       /languages
  */
 
@@ -68,7 +68,7 @@ register_deactivation_hook( __FILE__, array( 'Autoblog_AI\\Deactivator', 'deacti
  */
 function autoblog_ai_load_textdomain() {
 	load_plugin_textdomain(
-		'wp-autoblog-ai',
+		'autoblog-ai',
 		false,
 		dirname( AUTOBLOG_AI_PLUGIN_BASENAME ) . '/languages'
 	);
