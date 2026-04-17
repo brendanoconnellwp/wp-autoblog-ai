@@ -4,7 +4,7 @@ Tags: ai, content generation, blogging, openai, gemini
 Requires at least: 7.0
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 1.3.2
+Stable tag: 1.3.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -83,6 +83,11 @@ No data is sent unless you actively trigger article generation. Please review ea
 
 == Changelog ==
 
+= 1.3.3 =
+* Wired up load_plugin_textdomain() so /languages translations load.
+* Added languages/autoblog-ai.pot translation template (87 strings).
+* Reconciled LICENSE file with GPL-2.0 to match plugin header and readme.
+
 = 1.3.2 =
 * Fixed minimum WordPress version requirement (now 7.0+).
 * Fixed async queue jobs attributing posts to the wrong author.
@@ -115,6 +120,9 @@ No data is sent unless you actively trigger article generation. Please review ea
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.3.3 =
+Enables translations and aligns LICENSE with the GPL-2.0-or-later header.
 
 = 1.3.2 =
 Fixes author attribution on async jobs, raises minimum WP to 7.0, adds queue cleanup and concurrency limits. DB schema upgrades automatically.
