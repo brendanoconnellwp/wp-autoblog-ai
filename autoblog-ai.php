@@ -64,6 +64,18 @@ register_activation_hook( __FILE__, array( 'Autoblog_AI\\Activator', 'activate' 
 register_deactivation_hook( __FILE__, array( 'Autoblog_AI\\Deactivator', 'deactivate' ) );
 
 /**
+ * Load translations.
+ */
+function autoblog_ai_load_textdomain() {
+	load_plugin_textdomain(
+		'wp-autoblog-ai',
+		false,
+		dirname( AUTOBLOG_AI_PLUGIN_BASENAME ) . '/languages'
+	);
+}
+add_action( 'init', 'autoblog_ai_load_textdomain' );
+
+/**
  * Boot the plugin after all plugins are loaded.
  */
 function autoblog_ai_init() {
