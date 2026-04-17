@@ -88,21 +88,21 @@ class Settings_Page {
 		// Sections.
 		add_settings_section(
 			'autoblog_ai_content_section',
-			__( 'Content Defaults', 'wp-autoblog-ai' ),
+			__( 'Content Defaults', 'autoblog-ai' ),
 			'__return_null',
 			self::OPTION_GROUP
 		);
 
 		add_settings_section(
 			'autoblog_ai_image_section',
-			__( 'Image Generation', 'wp-autoblog-ai' ),
+			__( 'Image Generation', 'autoblog-ai' ),
 			'__return_null',
 			self::OPTION_GROUP
 		);
 
 		add_settings_section(
 			'autoblog_ai_linking_section',
-			__( 'Internal Linking', 'wp-autoblog-ai' ),
+			__( 'Internal Linking', 'autoblog-ai' ),
 			'__return_null',
 			self::OPTION_GROUP
 		);
