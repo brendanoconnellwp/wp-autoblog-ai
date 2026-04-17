@@ -1,0 +1,396 @@
+# Copyright (C) 2026 Brendan O'Connell
+# This file is distributed under the GPL-2.0-or-later license.
+msgid ""
+msgstr ""
+"Project-Id-Version: AutoBlog AI 1.3.2\n"
+"Report-Msgid-Bugs-To: https://github.com/brendanoconnellwp/wp-autoblog-ai/issues\n"
+"POT-Creation-Date: 2026-04-17 18:42+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2026-04-17 18:42+0000\n"
+"Language-Team: \n"
+"X-Domain: wp-autoblog-ai\n"
+
+#: templates/generator-page.php:19
+msgid "10 Best WordPress Plugins in 2025\nHow to Speed Up Your Website\nComplete Guide to SEO for Beginners"
+msgstr ""
+
+#: templates/generator-page.php:118
+#: templates/settings-page.php:124
+msgid "3D Render"
+msgstr ""
+
+#: templates/generator-page.php:50
+#: templates/settings-page.php:54
+msgid "Academic"
+msgstr ""
+
+#: includes/admin/class-admin.php:107
+msgid "Actions"
+msgstr ""
+
+#: includes/admin/class-admin.php:50
+#: includes/admin/class-admin.php:51
+msgid "Article Generator"
+msgstr ""
+
+#: templates/generator-page.php:18
+msgid "Article Titles (one per line)"
+msgstr ""
+
+#: templates/generator-page.php:30
+#: templates/settings-page.php:71
+msgid "Article Type"
+msgstr ""
+
+#: includes/admin/class-admin.php:39
+#: includes/admin/class-admin.php:40
+msgid "AutoBlog AI"
+msgstr ""
+
+#: templates/settings-page.php:16
+msgid "AutoBlog AI Settings"
+msgstr ""
+
+#: includes/class-autoblog-ai.php:66
+msgid "AutoBlog AI requires the WordPress AI Client to generate articles. Please upgrade to WordPress 7.0+ or install the wp-ai-client plugin."
+msgstr ""
+
+#: templates/generator-page.php:8
+msgid "AutoBlog AI — Article Generator"
+msgstr ""
+
+#: templates/settings-page.php:150
+msgid "Automatically add internal links to generated articles"
+msgstr ""
+
+#: templates/generator-page.php:32
+#: templates/settings-page.php:75
+msgid "Blog Post"
+msgstr ""
+
+#: templates/generator-page.php:49
+#: templates/settings-page.php:53
+msgid "Casual"
+msgstr ""
+
+#: templates/generator-page.php:89
+msgid "Category"
+msgstr ""
+
+#: includes/admin/class-admin.php:108
+msgid "Clear Finished"
+msgstr ""
+
+#: templates/generator-page.php:36
+#: templates/settings-page.php:79
+msgid "Comparison"
+msgstr ""
+
+#: includes/admin/class-admin.php:96
+msgid "Complete"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:91
+#: templates/settings-page.php:34
+msgid "Content Defaults"
+msgstr ""
+
+#: templates/generator-page.php:47
+#: templates/settings-page.php:51
+msgid "Conversational"
+msgstr ""
+
+#: templates/generator-page.php:109
+msgid "DALL-E"
+msgstr ""
+
+#: templates/settings-page.php:112
+msgid "DALL-E (via WP AI SDK)"
+msgstr ""
+
+#: includes/admin/class-admin.php:99
+msgid "Delete"
+msgstr ""
+
+#: includes/admin/class-admin.php:101
+msgid "Delete this queue item?"
+msgstr ""
+
+#: templates/generator-page.php:119
+#: templates/settings-page.php:125
+msgid "Digital Art"
+msgstr ""
+
+#: templates/generator-page.php:82
+msgid "Draft"
+msgstr ""
+
+#: templates/settings-page.php:144
+msgid "Enable Internal Linking"
+msgstr ""
+
+#: templates/generator-page.php:129
+msgid "Enable internal linking"
+msgstr ""
+
+#: templates/generator-page.php:66
+#: templates/settings-page.php:85
+msgid "FAQ Count"
+msgstr ""
+
+#: includes/admin/class-admin.php:97
+msgid "Failed"
+msgstr ""
+
+#: includes/admin/class-admin.php:103
+msgid "Failed to submit articles. Please try again."
+msgstr ""
+
+#: templates/generator-page.php:57
+msgid "First Person"
+msgstr ""
+
+#: templates/settings-page.php:64
+msgid "First Person (I/We)"
+msgstr ""
+
+#: templates/generator-page.php:135
+#: templates/generator-page.php:14
+msgid "Generate Articles"
+msgstr ""
+
+#: includes/admin/class-admin.php:94
+msgid "Generating..."
+msgstr ""
+
+#: templates/generator-page.php:146
+msgid "Generation Queue"
+msgstr ""
+
+#: templates/generator-page.php:34
+#: templates/settings-page.php:77
+msgid "How-To Guide"
+msgstr ""
+
+#: templates/generator-page.php:117
+#: templates/settings-page.php:123
+msgid "Illustration"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:98
+#: templates/generator-page.php:106
+#: templates/settings-page.php:104
+msgid "Image Generation"
+msgstr ""
+
+#: templates/settings-page.php:107
+msgid "Image Provider"
+msgstr ""
+
+#: templates/generator-page.php:114
+#: templates/settings-page.php:118
+msgid "Image Style"
+msgstr ""
+
+#: templates/generator-page.php:46
+#: templates/settings-page.php:50
+msgid "Informative"
+msgstr ""
+
+#: includes/admin/class-settings-page.php:105
+#: templates/settings-page.php:141
+msgid "Internal Linking"
+msgstr ""
+
+#: templates/generator-page.php:72
+#: templates/settings-page.php:94
+msgid "Key Takeaways"
+msgstr ""
+
+#: templates/generator-page.php:33
+#: templates/settings-page.php:76
+msgid "Listicle"
+msgstr ""
+
+#: templates/settings-page.php:155
+msgid "Max Links Per Article"
+msgstr ""
+
+#: templates/generator-page.php:37
+#: templates/settings-page.php:80
+msgid "News Article"
+msgstr ""
+
+#: includes/admin/class-admin.php:104
+#: templates/generator-page.php:149
+msgid "No articles in the queue. Submit titles to get started."
+msgstr ""
+
+#: templates/generator-page.php:108
+msgid "None"
+msgstr ""
+
+#: templates/settings-page.php:111
+msgid "None (no images)"
+msgstr ""
+
+#: templates/settings-page.php:90
+msgid "Number of FAQ items to include (0 to disable)."
+msgstr ""
+
+#: templates/settings-page.php:99
+msgid "Number of key takeaways to include (0 to disable)."
+msgstr ""
+
+#: templates/generator-page.php:84
+msgid "Pending Review"
+msgstr ""
+
+#: templates/generator-page.php:51
+#: templates/settings-page.php:55
+msgid "Persuasive"
+msgstr ""
+
+#: templates/generator-page.php:116
+#: templates/settings-page.php:122
+msgid "Photorealistic"
+msgstr ""
+
+#: includes/admin/class-admin.php:102
+msgid "Please enter at least one article title."
+msgstr ""
+
+#: templates/generator-page.php:55
+#: templates/settings-page.php:60
+msgid "Point of View"
+msgstr ""
+
+#: templates/generator-page.php:80
+msgid "Post Status"
+msgstr ""
+
+#: templates/settings-page.php:163
+msgid "Post Types to Link"
+msgstr ""
+
+#: templates/generator-page.php:48
+#: templates/settings-page.php:52
+msgid "Professional"
+msgstr ""
+
+#: templates/generator-page.php:83
+msgid "Published"
+msgstr ""
+
+#: includes/admin/class-admin.php:95
+msgid "Queued"
+msgstr ""
+
+#: includes/admin/class-admin.php:109
+msgid "Remove all completed and failed items from the queue?"
+msgstr ""
+
+#: templates/settings-page.php:136
+msgid "Required only if using Stability AI for image generation. Stored encrypted."
+msgstr ""
+
+#: includes/admin/class-admin.php:98
+msgid "Retry"
+msgstr ""
+
+#: templates/generator-page.php:35
+#: templates/settings-page.php:78
+msgid "Review"
+msgstr ""
+
+#: templates/generator-page.php:58
+msgid "Second Person"
+msgstr ""
+
+#: templates/settings-page.php:65
+msgid "Second Person (You)"
+msgstr ""
+
+#: templates/settings-page.php:183
+msgid "Select which post types to include when searching for internal link targets."
+msgstr ""
+
+#: includes/admin/class-admin.php:59
+#: includes/admin/class-admin.php:60
+msgid "Settings"
+msgstr ""
+
+#: templates/generator-page.php:110
+#: templates/settings-page.php:113
+msgid "Stability AI"
+msgstr ""
+
+#: templates/settings-page.php:131
+msgid "Stability AI API Key"
+msgstr ""
+
+#: includes/admin/class-admin.php:106
+msgid "Status"
+msgstr ""
+
+#: templates/generator-page.php:99
+msgid "Tags (comma-separated)"
+msgstr ""
+
+#: templates/settings-page.php:42
+msgid "Target word count per article."
+msgstr ""
+
+#: templates/settings-page.php:21
+msgid "Text generation API keys (OpenAI, Anthropic, Gemini) are managed by their respective AI Provider plugins. Install and configure at least one AI Provider plugin from the WordPress plugin directory."
+msgstr ""
+
+#: templates/generator-page.php:59
+#: templates/settings-page.php:66
+msgid "Third Person"
+msgstr ""
+
+#: includes/admin/class-admin.php:105
+msgid "Title"
+msgstr ""
+
+#: templates/generator-page.php:44
+#: templates/settings-page.php:46
+msgid "Tone"
+msgstr ""
+
+#: includes/admin/class-admin.php:111
+msgid "Too many titles. Maximum is %d per batch."
+msgstr ""
+
+#: includes/admin/class-admin.php:100
+msgid "View Post"
+msgstr ""
+
+#: templates/generator-page.php:120
+#: templates/settings-page.php:126
+msgid "Watercolor"
+msgstr ""
+
+#: templates/generator-page.php:24
+#: templates/settings-page.php:37
+msgid "Word Count"
+msgstr ""
+
+#: templates/settings-page.php:25
+msgid "WordPress AI Client detected."
+msgstr ""
+
+#: templates/settings-page.php:27
+msgid "WordPress AI Client not detected. Requires WordPress 7.0+ or the wp-ai-client plugin, plus at least one AI Provider plugin."
+msgstr ""
+
+#: templates/generator-page.php:101
+msgid "wordpress, seo, blogging"
+msgstr ""
+
+#: templates/generator-page.php:91
+msgid "— None —"
+msgstr ""
